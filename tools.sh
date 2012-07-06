@@ -35,9 +35,11 @@ function fail()
 # args: $1: ipaddr $2: target $3: additional apps
 function build_smews()
 {
+    scons -c >& /dev/null
     if ! scons ipaddr=$1 apps=smews_check,$3 target=$2 debug=0 >& /dev/null
     then
 	fail $1 $2 "BUILD"
+	return 1
     fi
 }
 
@@ -59,6 +61,6 @@ function launch_smews()
 	    return 1
 	    ;;
     esac
-    sleep 1
+ #   sleep 1
     return 0
 }
