@@ -1,6 +1,4 @@
 #!/bin/bash
-IPV4_ADDR=192.168.100.100
-IPV6_ADDR=fc23::4
 
 . tools.sh
 
@@ -8,10 +6,12 @@ test_count=0
 success_count=0
 
 # args: $1 ip
+# args: $2 target
 function build_and_check()
 {
+    echo "Checking ip $1 for target $2"
     # Build linux target with smews_check application
-    if ! build_smews $1 linux
+    if ! build_smews $1 $2
     then
 	return 1
     fi
@@ -19,13 +19,13 @@ function build_and_check()
     
     for test in `run-parts --list $TESTS_FOLDER/tests` 
     do
-	if ! launch_smews $1 linux
+	if ! launch_smews $1 $2
 	then
 	    return 1
 	fi
 
 	test_count=`expr $test_count + 1`
-	if ! $test $1 linux
+	if ! $test $1 $2
 	then
 	    fail $1 linux "TEST:`basename $test`"
 	else
@@ -34,7 +34,7 @@ function build_and_check()
 		echo -n "."
 		success_count=`expr $success_count + 1`
 	    else
-		fail $1 linux "TEST:`basename $test`:*crash*"
+		fail $1 $2 "TEST:`basename $test`:*crash*"
 	    fi
 	fi
 	kill_smews
@@ -48,8 +48,12 @@ then
     cd $*
 fi
 
-build_and_check $IPV4_ADDR
-build_and_check $IPV6_ADDR
+build_and_check 192.168.100.4 linux
+build_and_check fc23::4 linux
+
+build_and_check 192.168.100.2 mbed_ethernet
+build_and_check fc23::2 mbed_ethernet
+
 
 if [ "$test_count" -eq 0 ]
 then

@@ -41,6 +41,21 @@ function build_smews()
 	fail $1 $2 "BUILD"
 	return 1
     fi
+    case $2 in
+	mbed_ethernet)
+	    FOLDER=`mount | grep '/MBED ' | awk '{ print $3}'`
+	    echo "Copying to $FOLDER"
+	    if ! cp bin/mbed_ethernet/smews.bin $FOLDER
+	    then
+		fail $1 $2 "Build: Failed to program MBED"
+		return 1
+	    fi
+	    sync
+	    # Reset MBED
+	    ;;
+	*)
+	    ;;
+    esac
 }
 
 # args: $1 ip $2 target
@@ -55,6 +70,10 @@ function launch_smews()
 		return 1
 	    fi
 	    sudo bin/linux/smews.elf &
+	    ;;
+	mbed_ethernet)
+	    # Reset MBED
+	    sleep 2
 	    ;;
 	*)
 	    fail $1 $2 "LAUNCH: target not supported by script"
