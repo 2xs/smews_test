@@ -1,0 +1,11 @@
+Smews shell based test framework
+================================
+
+This repository allows building and checking smews.
+The main script is the run_test script. It takes one parameter,
+the smews folder. 
+When run, it will perform for IPv4 and IPv6
+1. Clean and build Smews for linux target (other target will be supported later)
+2. Launch smews
+3. Execute all scripts in the test folder and report their success/errors
+4. Output a report stating how many tests were successful 
