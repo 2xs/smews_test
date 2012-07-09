@@ -1,5 +1,3 @@
 #!/bin/bash
 
-SCRIPT_FOLDER=`cd \`dirname $0\` && pwd`
-
-$SCRIPT_FOLDER/../test_download.sh $1 $2 "smews_check/dynamic?size=1000"
+test_download.sh $1 $2 "smews_check/dynamic?size=1000"

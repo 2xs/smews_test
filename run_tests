@@ -1,67 +1,95 @@
 #!/bin/bash
 
-. tools.sh
+# . tools.sh
 
 test_count=0
 success_count=0
+
+# args: $1 script, $2 ip, $3 target 
+function run_script()
+{
+    test -x $TESTS_FOLDER/targets/$3/$1 || return 0
+    $TESTS_FOLDER/targets/$3/$1 $SMEWS_FOLDER $2
+}
+
+function count_test()
+{
+    test_count=`expr $test_count + 1`
+}
+
+function test_ok()
+{
+    echo -n "."
+    success_count=`expr $success_count + 1`
+}
+
+FAILS=
+
+# Display a fail test message
+# args: $1: ip: $2: target remainder: message
+function test_fail()
+{
+    MESSAGE="FAIL,$1,$2"
+    shift 2
+    MESSAGE="$MESSAGE,$*"
+    FAILS="$FAILS|$MESSAGE"
+    echo $MESSAGE >> $LOG_FILE
+    echo -n "X"
+}
+
 
 # args: $1 ip
 # args: $2 target
 function build_and_check()
 {
-    echo "Checking ip $1 for target $2"
-    # Build linux target with smews_check application
-    if is_v6 $1
+
+    count_test
+    if ! run_script build $1 $2
     then
-	more_app=icmpv6
-    else
-	more_app=""
-    fi
-    if ! build_smews $1 $2 $more_app
-    then
+	test_fail $1 $2 "BUILD"
 	return 1
     fi
+    test_ok
 
-    
-    for test in `run-parts --list $TESTS_FOLDER/tests` 
+    for test in `run-parts --list $TESTS_FOLDER/tests 2>/dev/null` `run-parts --list $TESTS_FOLDER/tests/targets/$2 2>/dev/null`
     do
-	if ! is_alive $1 $2
+	if ! run_script is_alive $1 $2
 	then
-	    if ! launch_smews $1 $2
+	    if ! run_script launch $1 $2
 	    then
 		return 1
 	    fi
 	fi
 
-	test_count=`expr $test_count + 1`
-	if ! $test $1 $2
+	count_test
+	if ! $test $1 $2 2>> $LOG_FILE 1>&2
 	then
-	    fail $1 $2 "TEST:`basename $test`"
+	    test_fail $1 $2 "TEST:`basename $test`"
 	else
-	    if is_alive $1 $2
-	    then
-		echo -n "."
-		success_count=`expr $success_count + 1`
-	    else
-		fail $1 $2 "TEST:`basename $test`:*crash*"
-	    fi
+	    test_ok
 	fi
     done
-    kill_smews $1 $2
+    run_script kill $1 $2
     echo ""
 }
 
 TESTS_FOLDER=`cd \`dirname $0\` && pwd`
+SMEWS_FOLDER=`pwd`
+LOG_FILE="$TESTS_FOLDER/`date +%Y-%m-%d-%H-%M`.log"
+export PATH="$PATH:$TESTS_FOLDER/tools"
+
+echo -n '' > $LOG_FILE
+
 if [ $# -eq 1 ]
 then
-    cd $*
+    SMEWS_FOLDER=`cd $1 && pwd`
 fi
 
 build_and_check 192.168.100.4 linux
-build_and_check fc23::4 linux
+#build_and_check fc23::4 linux
 
 build_and_check 192.168.100.2 mbed_ethernet
-build_and_check fc23::2 mbed_ethernet
+#build_and_check fc23::2 mbed_ethernet
 
 
 if [ "$test_count" -eq 0 ]
@@ -70,6 +98,7 @@ then
     exit 1
 fi
 
+echo $FAILS | tr '|' '\n'
 echo "$success_count/$test_count tests passed"
 
-test $success_count -eq $test_count
+test $success_count -eq $test_count && rm -f $LOG_FILE

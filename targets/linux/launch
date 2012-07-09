@@ -1,0 +1,7 @@
+#!/bin/bash
+
+SMEWS_FOLDER=$1
+
+sudo echo -n "" # ensure that password is typed in an interactive command
+sudo $SMEWS_FOLDER/bin/linux/smews.elf &
+

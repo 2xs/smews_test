@@ -1,0 +1,8 @@
+#!/bin/bash
+
+dir=`cd \`dirname $0\` && pwd`
+
+while $dir/is_alive
+do
+    sudo pkill smews.elf
+done
