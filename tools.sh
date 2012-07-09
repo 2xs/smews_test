@@ -1,22 +1,27 @@
 #!/bin/bash
 
 # Kill smews and exit
-# args: $1 return value
+# args: $1 ip $2 target $3 value
 function clean_exit()
 {
-    kill_smews
-    exit $1
+    kill_smews $1 $2
+    exit $3
 }
 
 # Kill smews
 # return true if smews was running and false if not
+# args: $1 ip, $2 target
 function kill_smews()
 {
-    if ! pgrep smews.elf > /dev/null
+    if ! [ $2 = "linux" ]
+    then
+	return 0
+    fi
+    if ! is_alive $1 $2
     then
 	return 1
     fi
-    while pgrep smews.elf > /dev/null
+    while is_alive $1 $2
     do
 	sudo pkill smews.elf
     done
@@ -32,6 +37,43 @@ function fail()
     echo $* 1>&2
 }
 
+# Checks if smews is still alive
+# args: $1 ip, $2 target
+function is_alive()
+{
+    case $2 in
+	linux)
+	    pgrep smews.elf > /dev/null
+	    return $?
+	    ;;
+	*)
+	    ;;
+    esac
+    return 0
+}
+
+function flash_mbed()
+{
+    FOLDER=`mount | grep '/MBED ' | awk '{ print $3}'`
+    if ! cp bin/mbed_ethernet/smews.bin $FOLDER
+    then
+	fail $1 $2 "Build: Failed to program MBED"
+	return 1
+    fi
+    sync
+    sleep 1
+    # Reset MBED
+    reset_mbed
+    sleep 3 # Wait for flash
+}
+
+function reset_mbed()
+{
+    $TESTS_FOLDER/send_break /dev/ttyACM0
+    sleep 3
+}
+
+
 # args: $1: ipaddr $2: target $3: additional apps
 function build_smews()
 {
@@ -43,20 +85,13 @@ function build_smews()
     fi
     case $2 in
 	mbed_ethernet)
-	    FOLDER=`mount | grep '/MBED ' | awk '{ print $3}'`
-	    echo "Copying to $FOLDER"
-	    if ! cp bin/mbed_ethernet/smews.bin $FOLDER
-	    then
-		fail $1 $2 "Build: Failed to program MBED"
-		return 1
-	    fi
-	    sync
-	    # Reset MBED
+	    flash_mbed
 	    ;;
 	*)
 	    ;;
     esac
 }
+
 
 # args: $1 ip $2 target
 function launch_smews()
@@ -73,7 +108,7 @@ function launch_smews()
 	    ;;
 	mbed_ethernet)
 	    # Reset MBED
-	    sleep 2
+	    reset_mbed
 	    ;;
 	*)
 	    fail $1 $2 "LAUNCH: target not supported by script"
@@ -82,4 +117,11 @@ function launch_smews()
     esac
  #   sleep 1
     return 0
+}
+
+# returns true if $1 is a ipv6 addr
+# Only check if a ':' character is present, so only works because the script calls it correctly
+function is_v6()
+{
+    echo "$1" | grep -q ':'
 }
