@@ -17,6 +17,7 @@ Adding a new test
 A test can be any kind of executable for example a shell or python script (must
 have the x bit though and the right usual #!... comment in first line):
 
+* It will be called with two parameters: the ip address of the tested smews and the target name,
 * It must exit with code 0 if test worked as expected or any positive value otherwise,
 * If the test is generic, it must be added in the tests folder,
 * If the test is target dependant, it must be added in the tests/target/<target> folder,
