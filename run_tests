@@ -50,18 +50,15 @@ function build_and_check()
     if ! run_script build $1 $2
     then
 	test_fail $1 $2 "BUILD"
-	return 1
+    else
+	test_ok
     fi
-    test_ok
 
     for test in `run-parts --list $TESTS_FOLDER/tests 2>/dev/null` `run-parts --list $TESTS_FOLDER/tests/targets/$2 2>/dev/null`
     do
 	if ! run_script is_alive $1 $2
 	then
-	    if ! run_script launch $1 $2
-	    then
-		return 1
-	    fi
+	    run_script launch $1 $2
 	fi
 
 	count_test

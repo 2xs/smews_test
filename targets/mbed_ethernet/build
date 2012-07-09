@@ -9,7 +9,7 @@ then
 fi
 cd $SMEWS_FOLDER
 scons -c  >& /dev/null
-scons ipaddr=$IP_ADDR apps=smews_check$ADD_APP target=mbed_ethernet >& /dev/null
+scons ipaddr=$IP_ADDR apps=:smews_check$ADD_APP target=mbed_ethernet >& /dev/null
 
 MBED_PATH=`mount -l | grep MBED | cut -d\  -f3 | head -1`
 cp $SMEWS_FOLDER/bin/mbed_ethernet/smews.bin $MBED_PATH && sync && sleep 1

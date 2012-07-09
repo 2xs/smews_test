@@ -5,4 +5,4 @@ IP_ADDR=$2
 
 cd $SMEWS_FOLDER
 scons -c  >& /dev/null
-scons ipaddr=$IP_ADDR apps=smews_check target=linux >& /dev/null
+scons ipaddr=$IP_ADDR apps=:smews_check target=linux >& /dev/null
