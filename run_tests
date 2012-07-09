@@ -5,6 +5,9 @@
 test_count=0
 success_count=0
 
+IPV4_PREFIX=192.168.100.
+IPV6_PREFIX=fc23::
+
 # args: $1 script, $2 ip, $3 target 
 function run_script()
 {
@@ -70,7 +73,6 @@ function build_and_check()
 	fi
     done
     run_script kill $1 $2
-    echo ""
 }
 
 TESTS_FOLDER=`cd \`dirname $0\` && pwd`
@@ -85,13 +87,15 @@ then
     SMEWS_FOLDER=`cd $1 && pwd`
 fi
 
-build_and_check 192.168.100.4 linux
-#build_and_check fc23::4 linux
+IP_POSTFIX=2
+for target in `ls targets`
+do
+    build_and_check ${IPV4_PREFIX}$IP_POSTFIX $target
+    build_and_check ${IPV6_PREFIX}$IP_POSTFIX $target
+    IP_POSTFIX=`expr $IP_POSTFIX + 1`
+done
 
-build_and_check 192.168.100.2 mbed_ethernet
-#build_and_check fc23::2 mbed_ethernet
-
-
+echo ""
 if [ "$test_count" -eq 0 ]
 then
     echo "No test performed!"
