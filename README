@@ -4,8 +4,43 @@ Smews shell based test framework
 This repository allows building and checking smews.
 The main script is the run_test script. It takes one parameter,
 the smews folder. 
-When run, it will perform for IPv4 and IPv6
-1. Clean and build Smews for linux target (other target will be supported later)
-2. Launch smews
-3. Execute all scripts in the test folder and report their success/errors
-4. Output a report stating how many tests were successful 
+
+When run, it will for ipv4 and ipv6, for each defined target in the targets folder:
+1. Build smews
+2. Run smews
+3. Perform all test in the tests folder
+4. Perform all target dependent tests in the tests/targets/<target> folder
+
+Adding a new test
+=================
+
+A test can be any kind of executable for example a shell or python script (must
+have the x bit though and the right usual #!... comment in first line):
+
+* It must exit with code 0 if test worked as expected or any positive value otherwise,
+* If the test is generic, it must be added in the tests folder,
+* If the test is target dependant, it must be added in the tests/target/<target> folder,
+* Any output will be redirected to a log file. This file will only be kept if at least one test fails.
+* The test order is as run-parts will order them (man run-parts) but all the generic tests will be performed before the target dependant tests
+* a test_download.sh script is available in the tools folder. You can consider that this script is in the PATH environment variable when your test is run,
+  This script takes 3 parameters: the ip from which to download, the url and optionaly the expected http response code (200 is used if no value is given). The script returns true if all goes well.
+
+Adding a target
+===============
+
+To add a target, you must implement 4 scripts in the targets/<target>
+folder. Usually, the folder name is the one used by smews in its target folder
+(for example linux,mbed_ethernet...). The four script will be called with two
+parameters: the smews folder and the desired ip address for the generated smews
+image.
+
+1. build: builds smews in a configuration that will allow the tests to be
+   performed. That includes at least the smews_check application that *MUST* be
+   available at the root of the web site (so built with apps=:smews_check,...).
+   This *should* also flash the device with the built image if the target is a real
+   hardware one,
+2. is_alive: returns true if the smews server is still running. It is used to
+   verify that previous tests did not crash it and to re run smews if needed for
+   the other tests,
+3. kill: stops the smews server on the target,
+4. launch: Launch smews (for hardware targets, it may be just a device reset)
