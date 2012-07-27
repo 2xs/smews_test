@@ -1,0 +1,3 @@
+#!/bin/bash
+
+pgrep smews.elf >& /dev/null

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+SMEWS_FOLDER=$1
+IP_ADDR=$2
+
+if echo $IP_ADDR | grep -q ':'
+then
+    ADD_APP=",icmpv6"
+fi
+
+MBED_PATH=`mount -l | grep MBED | cut -d\  -f3 | head -1`
+cp $SMEWS_FOLDER/bin/mbed_ethernet/smews.bin $MBED_PATH && sync && sleep 1
+
+MBED_TTY=`ls /dev/ttyACM? | head -1`
+send_break $MBED_TTY
+sleep 5

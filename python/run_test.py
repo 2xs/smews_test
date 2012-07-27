@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import sys, os, stat, subprocess
+import fileinput
 
+TEST_SUITES_FOLDER="test_suites"
 
 class Test:
     __tests = []
@@ -22,7 +24,10 @@ class Test:
                 sys.stderr.write("FAIL({}): {}\n".format(test["target"], test["what"]))
             else:
                 success = success + 1
-        sys.stdout.write("{}/{} tests passed ({:.2f} %)\n".format(success, len(Test.__tests), success / len(Test.__tests) * 100))
+        if not len(Test.__tests):
+            print("No test performed")
+        else:
+            print("{}/{} tests passed ({:.2f} %)".format(success, len(Test.__tests), success / len(Test.__tests) * 100))
 #####################################################
 
 def chdir(path):
@@ -31,17 +36,30 @@ def chdir(path):
     return current_path
 #####################################################    
 
-def get_target_list():
+def get_subfolder_list(folder):
+    try:
+        subfolders = os.listdir(folder)
+        for subfolder in subfolders[:]:
+            file_path = os.path.join(folder,subfolder)
+            mode = os.stat(file_path).st_mode
+            if not stat.S_ISDIR(mode):
+                subfolders.remove(subfolder)
+        return subfolders
+    except:
+        return []
+####################################################
+
+def get_smews_target_list():
     global smews_folder
     targets_folder = os.path.join(smews_folder,"targets")
-    targets = os.listdir(targets_folder)
-    for target in targets[:]:
-        file_path = os.path.join(targets_folder,target)
-        mode = os.stat(file_path).st_mode
-        if not stat.S_ISDIR(mode):
-            targets.remove(target)
-    return targets
+    return get_subfolder_list(targets_folder)
 #####################################################    
+
+def get_test_suite_list():
+    global script_folder
+    global TEST_SUITES_FOLDER
+    test_suite_folder = os.path.join(script_folder, TEST_SUITES_FOLDER);
+    return get_subfolder_list(test_suite_folder)
 
 def execute_command(args):
     process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -62,7 +80,7 @@ def perform_build(build_options):
     args = ["scons"]
     for (option,value) in build_options.items():
         args.append("{}={}".format(option,value))
-    try:    
+    try:
         execute_command(args)
     except:
         chdir(test_path)
@@ -70,7 +88,64 @@ def perform_build(build_options):
     chdir(test_path)
 #####################################################
 
+def test_target(target, ip):
+        Test.begin(target, "build({})".format(ip))
+        try:
+            perform_build({"ipaddr": ip, "target": target})
+            Test.success()
+        except:
+            Test.fail()
+#####################################################
 
+def get_file_lines(file_path):
+    try:
+        lines = []
+        f = fileinput.input(files=(file_path))
+        for line in f:
+            lines.append(line[:-1])
+        f.close()
+        return lines
+    except AttributeError as e:
+        print(e)
+        return []
+    except:
+        return []
+####################################################
+    
+def get_test_suite_folder(test_suite):
+    global script_folder, TEST_SUITES_FOLDER
+    test_suite_folder = os.path.join(os.path.join(script_folder, TEST_SUITES_FOLDER), test_suite)
+    return test_suite_folder
+####################################################
+
+
+def get_targets_to_test(test_suite):
+    test_suite_folder = get_test_suite_folder(test_suite)
+
+    # target and notarget files
+    target_file = os.path.join(test_suite_folder, "target")
+    notarget_file = os.path.join(test_suite_folder, "notarget")
+
+    # targets set
+    smews_targets = set(get_smews_target_list())
+    only_target_list = set(get_file_lines(target_file))
+    no_target_list = set(get_file_lines(notarget_file))
+    if len(only_target_list):
+        return list((smews_targets & only_target_list) - no_target_list)
+    else:
+        return list(smews_targets - no_target_list)
+####################################################        
+
+def get_apps_to_include(test_suite):
+    global smews_folder
+    test_suite_folder = get_test_suite_folder(test_suite)
+    apps_file = os.path.join(test_suite_folder, "useapps")
+    apps_path = os.path.join(test_suite_folder, "apps")
+    provided_apps = set(get_subfolder_list(apps_path))
+    apps = set(get_file_lines(apps_file))
+    smews_apps = set(get_subfolder_list(os.path.join(smews_folder, "apps")))
+    return list(provided_apps | (apps & smews_apps))
+####################################################
 
 if len(sys.argv) < 2:
     sys.stderr.write("Usage: {0} <smews_folder>\n".format(sys.argv[0]))
@@ -78,16 +153,20 @@ if len(sys.argv) < 2:
 else:
     smews_folder = sys.argv[1]
 
-targets=get_target_list()
+script_folder = sys.path[0]
+
+targets=get_smews_target_list()
 ips = ["192.168.100.200", "fc23::2"]
 
-for target in targets:
-    for ip in ips:
-        Test.begin(target, "build({})".format(ip))
-        try:
-            perform_build({"ipaddr": ip, "target": target})
-            Test.success()
-        except:
-            Test.fail()
+test_suites = get_test_suite_list()
+for test_suite in test_suites:
+    print(test_suite)
+    print("targets: {}".format(get_targets_to_test(test_suite)))
+    print("apps: {}".format(get_apps_to_include(test_suite)))
+    
+
+# for target in targets:
+#     for ip in ips:
+#         test_target(target, ip)
 
 Test.report()
