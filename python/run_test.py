@@ -147,6 +147,29 @@ def get_apps_to_include(test_suite):
     return list(provided_apps | (apps & smews_apps))
 ####################################################
 
+def get_smews_disable_options():
+    global smews_folder
+    return ['comet', 'post', 'timers', 'arguments', 'general_purpose_ip_handler']
+
+def get_disable_list(test_suite):
+    test_suite_folder = get_test_suite_folder(test_suite)
+    # files
+    disable_file = os.path.join(test_suite_folder, "disable")
+    nodisable_file = os.path.join(test_suite_folder, "nodisable")
+
+    # sets
+    smews_options = set(get_smews_disable_options())
+    disable_options = set(get_file_lines(disable_file))
+    nodisable_options = set(get_file_lines(nodisable_file))
+
+    if len(disable_options):
+        final_options_set = (smews_options & disable_options) - nodisable_options
+    else:
+        final_options_set = (smews_options) - nodisable_options
+    print(list(final_options_set))
+    return list(final_options_set)
+####################################################
+
 if len(sys.argv) < 2:
     sys.stderr.write("Usage: {0} <smews_folder>\n".format(sys.argv[0]))
     sys.exit(1)
@@ -163,6 +186,7 @@ for test_suite in test_suites:
     print(test_suite)
     print("targets: {}".format(get_targets_to_test(test_suite)))
     print("apps: {}".format(get_apps_to_include(test_suite)))
+    print("disable: {}".format(get_disable_list(test_suite)))
     
 
 # for target in targets:
