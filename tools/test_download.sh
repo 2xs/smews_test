@@ -14,7 +14,6 @@ then
 fi
 
 HTTP_CODE=`$CURL http://$ip_addr/$2`
-echo $?
 if [ $? -ne 0 ]
 then
     exit 1
