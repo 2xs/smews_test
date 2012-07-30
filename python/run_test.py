@@ -60,6 +60,7 @@ def get_test_suite_list():
     global TEST_SUITES_FOLDER
     test_suite_folder = os.path.join(script_folder, TEST_SUITES_FOLDER);
     return get_subfolder_list(test_suite_folder)
+#####################################################    
 
 def execute_command(args):
     process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -88,13 +89,19 @@ def perform_build(build_options):
     chdir(test_path)
 #####################################################
 
-def test_target(target, ip):
-        Test.begin(target, "build({})".format(ip))
-        try:
-            perform_build({"ipaddr": ip, "target": target})
-            Test.success()
-        except:
-            Test.fail()
+def test_build(test_suite, build_options):
+    what = "build(test_suite: {} -- ip: {} -- ".format(test_suite, build_options["ipaddr"])
+    if (build_options["disable"] == ""):
+        what = what + "all options)"
+    else:
+        what = what + "disabled options: {})".format(build_options["disable"])
+    Test.begin(build_options["target"], what)
+    try:
+        #perform_build(build_options)
+        #Test.success()
+        raise "plop"
+    except:
+        Test.fail()
 #####################################################
 
 def get_file_lines(file_path):
@@ -150,6 +157,27 @@ def get_apps_to_include(test_suite):
 def get_smews_disable_options():
     global smews_folder
     return ['comet', 'post', 'timers', 'arguments', 'general_purpose_ip_handler']
+#####################################################    
+
+def get_options_combinations(options_list):
+    if not options_list:
+        return []
+    if len(options_list) == 0:
+        return []
+    if len(options_list) == 1:
+        return options_list
+    if len(options_list) == 2:
+        return [[options_list[0]],[options_list[1]], options_list]
+    combinations = [[options_list[0]]]
+    sub_comb = get_options_combinations(options_list[1:])
+    for comb in  sub_comb:
+        combinations.append(comb[:])
+        comb.append(options_list[0])
+        combinations.append(comb[:])
+    return combinations
+    
+    
+#####################################################
 
 def get_disable_list(test_suite):
     test_suite_folder = get_test_suite_folder(test_suite)
@@ -166,8 +194,9 @@ def get_disable_list(test_suite):
         final_options_set = (smews_options & disable_options) - nodisable_options
     else:
         final_options_set = (smews_options) - nodisable_options
-    print(list(final_options_set))
-    return list(final_options_set)
+    combinations = get_options_combinations(list(final_options_set))
+    combinations.append("")
+    return combinations
 ####################################################
 
 if len(sys.argv) < 2:
@@ -183,11 +212,18 @@ ips = ["192.168.100.200", "fc23::2"]
 
 test_suites = get_test_suite_list()
 for test_suite in test_suites:
-    print(test_suite)
-    print("targets: {}".format(get_targets_to_test(test_suite)))
-    print("apps: {}".format(get_apps_to_include(test_suite)))
-    print("disable: {}".format(get_disable_list(test_suite)))
-    
+    targets = get_targets_to_test(test_suite)
+    apps = get_apps_to_include(test_suite)
+    disable_list = get_disable_list(test_suite)
+    build_options = {}
+    for target in targets:
+        build_options["target"] = target
+        for ip in ips:
+            build_options["ipaddr"] = ip
+            for disable in disable_list:
+                build_options["disable"] = ",".join(disable)
+                test_build(test_suite, build_options)
+                
 
 # for target in targets:
 #     for ip in ips:
