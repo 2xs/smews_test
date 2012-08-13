@@ -85,7 +85,7 @@ then
 fi
 
 IP_POSTFIX=2
-for target in `ls targets`
+for target in `ls $TESTS_FOLDER/targets`
 do
     build_and_check ${IPV4_PREFIX}$IP_POSTFIX $target
     build_and_check ${IPV6_PREFIX}$IP_POSTFIX $target
