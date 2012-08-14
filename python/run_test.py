@@ -72,7 +72,7 @@ def test_kill(test_suite, build_options):
 
 
 if len(sys.argv) < 2:
-    sys.stderr.write("Usage: {0} <smews_folder> [targets=<target1,...,targetN test_suites=ts1,...,tsN]\n".format(sys.argv[0]))
+    sys.stderr.write("Usage: {0} <smews_folder> [logfile=<file>] [targets=<target1,...,targetN] [test_suites=ts1,...,tsN]\n".format(sys.argv[0]))
     sys.exit(1)
 
 # Set needed folder to absolute paths
@@ -85,6 +85,9 @@ os.environ["PATH"] = os.environ["PATH"] + ":" + smews.tools_folder
 test_suites.folder = os.path.join(script_folder, "test_suites")
 
 
+targets_to_test = []
+test_suites_to_test = []
+
 for arg in sys.argv[2:]:
     if arg.startswith("targets="):
         t, e, targets = arg.partition("=")
@@ -92,6 +95,9 @@ for arg in sys.argv[2:]:
     if arg.startswith("test_suites="):
         t, e, ts = arg.partition("=")
         test_suites_to_test = ts.split(",")
+    if arg.startswith("logfile="):
+        t, e, log = arg.partition("=")
+        test.log_file = os.path.abspath(log)
 
 
 
@@ -100,12 +106,12 @@ ips = ["192.168.100.200", "fc23::2"]
 try:
     test_suites_list = test_suites.get_list()
 
-    if test_suites_to_test and len(test_suites_to_test):
+    if len(test_suites_to_test):
         test_suites_list = list(set(test_suites_list) & set(test_suites_to_test))
 
     for test_suite in test_suites_list:
         targets = test_suites.get_targets_to_test(test_suite)
-        if targets_to_test and len(targets_to_test):
+        if len(targets_to_test):
             targets = list(set(targets) & set(targets_to_test))
         apps = test_suites.get_apps_to_include(test_suite)
         # Copy needed apps to smews folder
