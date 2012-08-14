@@ -6,9 +6,12 @@ from modules import *
 TEST_SUITES_FOLDER="test_suites"
 
 
+def what(action, test_suite, build_options):
+    return "{};{};{}".format(action, test_suite, smews.build_options_to_string(build_options))
+
+
 def test_build(test_suite, build_options):
-    what = "build(test_suite: {} -- {})".format(test_suite, smews.build_options_to_string(build_options))
-    test.begin(build_options["target"], what)
+    test.begin(build_options["target"], what("build", test_suite, build_options))
     try:
         smews.build(build_options)
         test.success()
@@ -16,12 +19,11 @@ def test_build(test_suite, build_options):
     except smews.SmewsError as e:
         test.fail(e.message)
     return False
-#####################################################
+
 
 
 def test_program(test_suite, build_options):
-    what = "program(test_suite: {} -- {})".format(test_suite, smews.build_options_to_string(build_options))
-    test.begin(build_options["target"], what)
+    test.begin(build_options["target"], what("program", test_suite, build_options))
     try:
         smews.program(build_options["target"])
         test.success()
@@ -31,8 +33,7 @@ def test_program(test_suite, build_options):
     return False
 
 def test_run(test_suite, build_options):
-    what = "run(test_suite: {} -- {})".format(test_suite, smews.build_options_to_string(build_options))
-    test.begin(build_options["target"], what)
+    test.begin(build_options["target"], what("run", test_suite, build_options))
     try:
         smews.run(build_options["target"])
         test.success()
@@ -42,8 +43,7 @@ def test_run(test_suite, build_options):
     return False
 
 def do_test(test_script, test_suite, build_options):
-    what = "test(test_suite: {} -- {} -- {}".format(test_suite, os.path.basename(test_script), smews.build_options_to_string(build_options))
-    test.begin(build_options["target"], what)
+    test.begin(build_options["target"], what(os.path.basename(test_script), test_suite, build_options))
     try:
         args = [test_script, build_options["ipaddr"]]
         system.execute(args)
@@ -60,8 +60,7 @@ def do_tests(test_suite, build_options):
         do_test(test, test_suite, build_options)
 
 def test_kill(test_suite, build_options):
-    what = "kill(test_suite: {} -- {})".format(test_suite, smews.build_options_to_string(build_options))
-    test.begin(build_options["target"], what)
+    test.begin(build_options["target"], what("kill", test_suite, build_options))
     try:
         smews.kill(build_options["target"])
         test.success()
@@ -73,24 +72,37 @@ def test_kill(test_suite, build_options):
 
 
 if len(sys.argv) < 2:
-    sys.stderr.write("Usage: {0} <smews_folder> [target1 ... targetN]\n".format(sys.argv[0]))
+    sys.stderr.write("Usage: {0} <smews_folder> [targets=<target1,...,targetN test_suites=ts1,...,tsN]\n".format(sys.argv[0]))
     sys.exit(1)
 
 # Set needed folder to absolute paths
 script_folder = os.path.abspath(sys.path[0])
+test.log_file = os.path.join(script_folder, "test.csv")
 smews.folder = os.path.abspath(sys.argv[1])
 smews.tools_folder = os.path.join(script_folder, "tools")
 # update the PATH environment so that all run scripts have a direct access to the tools scripts
 os.environ["PATH"] = os.environ["PATH"] + ":" + smews.tools_folder
-
-
-targets_to_test = sys.argv[2:]
 test_suites.folder = os.path.join(script_folder, "test_suites")
+
+
+for arg in sys.argv[2:]:
+    if arg.startswith("targets="):
+        t, e, targets = arg.partition("=")
+        targets_to_test = targets.split(",")
+    if arg.startswith("test_suites="):
+        t, e, ts = arg.partition("=")
+        test_suites_to_test = ts.split(",")
+
+
 
 ips = ["192.168.100.200", "fc23::2"]
 
 try:
     test_suites_list = test_suites.get_list()
+
+    if test_suites_to_test and len(test_suites_to_test):
+        test_suites_list = list(set(test_suites_list) & set(test_suites_to_test))
+
     for test_suite in test_suites_list:
         targets = test_suites.get_targets_to_test(test_suite)
         if targets_to_test and len(targets_to_test):

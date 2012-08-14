@@ -19,8 +19,8 @@ tools_folder = "."
 def build_options_to_string(build_options):
     str = ""
     for (option,value) in build_options.items():
-        str = str + " {}={}".format(option,value)
-    return str
+        str = str + "{}={} ".format(option,value)
+    return str.strip()
     
 
 def build(build_options):

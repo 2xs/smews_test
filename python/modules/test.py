@@ -1,6 +1,8 @@
-import sys
+import sys,os
 
 __tests = []
+
+log_file = "test.csv"
 
 def begin(target, what):
     global __tests
@@ -19,6 +21,13 @@ def fail(message=None):
     sys.stdout.write("X")
     sys.stdout.flush()
 
+def output_report(message, stderr=False):
+    global log_file
+    logfile = open(log_file, mode="a+")
+    logfile.write(message)
+    if stderr:
+        sys.stderr.write(message)
+    logfile.close()
 
 def report(full=False):
     global __tests
@@ -26,10 +35,9 @@ def report(full=False):
     success = 0
     for test in __tests:
         if not test["success"]:
-            sys.stderr.write("FAIL   ({}): {} - {}\n".format(test["target"], test["what"], test["why"]))
+            output_report("FAIL;{};{};{}\n".format(test["target"], test["what"], test["why"]), True)
         else:
-            if full:
-                sys.stderr.write("SUCCESS({}): {}\n".format(test["target"], test["what"]))
+            output_report("SUCCESS;{};{}\n".format(test["target"], test["what"]), full)
             success = success + 1
     if not len(__tests):
         print("No test performed")
