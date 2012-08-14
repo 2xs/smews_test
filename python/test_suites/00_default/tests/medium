@@ -1,3 +1,1 @@
-#!/bin/bash
-
-test_download.sh $1 smews_check/`basename $0`
+small

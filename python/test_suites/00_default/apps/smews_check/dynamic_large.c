@@ -34,11 +34,8 @@
 */
 /*
 <generator>
-        <handlers init="init_dynamic" doGet="get_dynamic"/>
+        <handlers init="init_dynamic_large" doGet="get_dynamic_large"/>
 	<properties persistence="volatile" />
-	<args>
-	        <arg name="size" type="uint16" />
-	</args>
 </generator>
  */
 
@@ -50,7 +47,7 @@
 
 static char array[ARRAY_SIZE];
 
-static char init_dynamic(void)
+static char init_dynamic_large(void)
 {
     int i,j;
     for (i = 0,j=32 ; i < ARRAY_SIZE ; ++i,++j)
@@ -68,14 +65,10 @@ static char init_dynamic(void)
     return 1;
 }
 
-static char get_dynamic(struct args_t *args)
+static char get_dynamic_large(struct args_t *args)
 {
     uint32_t i = 0;
-    uint16_t size = 1;
-
-#ifndef DISABLE_ARGS
-    size = args->size;
-#endif
+    uint16_t size = 1000;
 
     if (size == 0)
 	out_c('0');
