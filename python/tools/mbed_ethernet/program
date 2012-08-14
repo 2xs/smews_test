@@ -1,12 +1,8 @@
 #!/bin/bash
 
-SMEWS_FOLDER=$1
-IP_ADDR=$2
+set -e
 
-if echo $IP_ADDR | grep -q ':'
-then
-    ADD_APP=",icmpv6"
-fi
+SMEWS_FOLDER=$1
 
 MBED_PATH=`mount -l | grep MBED | cut -d\  -f3 | head -1`
 cp $SMEWS_FOLDER/bin/mbed_ethernet/smews.bin $MBED_PATH && sync && sleep 1
