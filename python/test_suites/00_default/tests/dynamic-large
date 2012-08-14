@@ -1,0 +1,3 @@
+#!/bin/bash
+
+test_download.sh $1 "smews_check/dynamic?size=1000"

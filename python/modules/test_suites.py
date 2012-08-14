@@ -6,7 +6,9 @@ folder = "."
 
 def get_list():
     global folder
-    return system.get_subfolder_list(folder)
+    suites = system.get_subfolder_list(folder)
+    suites.sort()
+    return suites
 #####################################################    
 
 def get_folder(test_suite):
@@ -33,11 +35,16 @@ def get_targets_to_test(test_suite):
         return list(smews_targets - no_target_list)
 ####################################################        
 
+def get_provided_apps(test_suite):
+    test_suite_folder = get_folder(test_suite)
+    apps_path = os.path.join(test_suite_folder, "apps")
+    return system.get_subfolder_list(apps_path)
+    
+
 def get_apps_to_include(test_suite):
     test_suite_folder = get_folder(test_suite)
     apps_file = os.path.join(test_suite_folder, "useapps")
-    apps_path = os.path.join(test_suite_folder, "apps")
-    provided_apps = set(system.get_subfolder_list(apps_path))
+    provided_apps = set(get_provided_apps(test_suite))
     apps = set(system.get_file_lines(apps_file))
     smews_apps = set(smews.get_apps())
     return list(provided_apps | (apps & smews_apps))
@@ -63,6 +70,23 @@ def get_disable_list(test_suite):
     return combinations
 ####################################################
 
+def copy_apps(test_suite):
+    provided_apps = get_provided_apps(test_suite)
+    apps_path = os.path.join(get_folder(test_suite),"apps")
+    smews_apps_folder = smews.get_apps_folder()
+    for app in provided_apps:
+        app_path = os.path.join(apps_path, app)
+        args = ["cp", "-r", app_path, smews_apps_folder]
+        system.execute(args)
+
+def remove_apps(test_suite):
+    provided_apps = get_provided_apps(test_suite)
+    smews_apps_folder = smews.get_apps_folder()
+    for app in provided_apps:
+        smews_app_path = os.path.join(smews_apps_folder, app)
+        args = ["rm", "-rf", smews_app_path]
+        system.execute(args)
+
 def get_options_combinations(options_list):
     if not options_list:
         return []
@@ -80,3 +104,14 @@ def get_options_combinations(options_list):
         combinations.append(comb[:])
     return combinations    
 #####################################################
+
+def get_tests(test_suite, target):
+    test_suite_folder = get_folder(test_suite)
+    tests_path = os.path.join(test_suite_folder, "tests")
+    target_specific_tests_path = os.path.join(os.path.join(tests_path,"targets"),target)
+    tests = []
+    for test in system.get_executable_list(tests_path):
+        tests.append(os.path.join(tests_path, test))
+    for test in system.get_executable_list(target_specific_tests_path):
+        tests.append(os.path.join(target_specific_tests_path, test))
+    return tests

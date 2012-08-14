@@ -4,17 +4,14 @@ from . import system
 class SmewsError(Exception):
     pass
 
-class SmewsProgramError(SmewsError):
-    def __init__(self, message):
-        self.message = message
 
 class SmewsBuildError(SmewsError):
     def __init__(self, message):
         self.message = message
 
-class SmewsRunError(SmewsError):
-    def __init__(self, message):
-        self.message = message
+class SmewsScriptError(SmewsError):
+    def __init__(self, message, script):
+        self.message = script + ": " + message
 
 folder = "."
 tools_folder = "."
@@ -54,28 +51,30 @@ def get_disable_options():
     return ['comet', 'post', 'timers', 'arguments', 'general_purpose_ip_handler']
 #####################################################    
 
+def get_apps_folder():
+    global folder
+    return os.path.join(folder, "apps")
+
 def get_apps():
     global folder
-    return system.get_subfolder_list(os.path.join(folder, "apps"))
+    return system.get_subfolder_list(get_apps_folder())
+
+def run_script(target, script):
+    global folder
+    global tools_folder
+    script = os.path.join(os.path.join(tools_folder,target),script)
+    args = [script, folder]
+    try:
+        system.execute(args)
+    except system.ExecutionError as e:
+        raise SmewsScriptError(e.message, script)
+    
 
 def program(target):
-    global folder
-    global tools_folder
-    program_script = os.path.join(os.path.join(tools_folder,target),"program")
-    args = [program_script, folder]
-    try:
-        system.execute(args)
-    except system.ExecutionError as e:
-        raise SmewsProgramError(e.message)
-
+    run_script(target, "program")
 
 def run(target):
-    global folder
-    global tools_folder
-    run_script = os.path.join(os.path.join(tools_folder,target),"run")
-    args = [run_script, folder]
-    try:
-        system.execute(args)
-    except system.ExecutionError as e:
-        raise SmewsRunError(e.message)
-    
+    run_script(target, "run")
+
+def kill(target):
+    run_script(target, "kill")

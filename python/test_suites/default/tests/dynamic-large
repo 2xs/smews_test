@@ -1,3 +1,0 @@
-#!/bin/bash
-
-test_download.sh $1 "dynamic?size=1000"

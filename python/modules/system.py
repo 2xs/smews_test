@@ -13,17 +13,12 @@ class ExecutionError(SystemError):
 
 def execute(args):
     try:
-        process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        devnull = open(os.devnull, mode="a+")
+        subprocess.check_call(args, stdout=devnull, stderr=devnull)
+    except subprocess.CalledProcessError as e:
+        raise ExecutionError("{} returned {}".format(args, e.returncode))
     except OSError:
-        raise ExecutionError("Failed to execute process: {}".format(args))
-    while not process.poll():
-        try:
-            process.communicate()
-        except ValueError:
-            break
-    if process.returncode:
-        raise ExecutionError("process returned {}".format(process.returncode))
-#####################################################
+        raise ExecutionError("failed to execute process: {}".format(args))
 
 def chdir(path):
     current_path = os.getcwd()
@@ -31,6 +26,23 @@ def chdir(path):
     return current_path
 #####################################################    
 
+
+def get_executable_list(folder):
+    try:
+        files = os.listdir(folder)
+        for entry in files[:]:
+            file_path = os.path.join(folder,entry)
+            if not os.access(file_path, os.X_OK):
+                files.remove(entry)
+                continue
+            mode = os.stat(file_path).st_mode
+            if stat.S_ISDIR(mode):
+                files.remove(entry)
+        files.sort()
+        return files
+    except OSError:
+        return []
+    
 
 def get_subfolder_list(folder):
     try:
@@ -40,6 +52,7 @@ def get_subfolder_list(folder):
             mode = os.stat(file_path).st_mode
             if not stat.S_ISDIR(mode):
                 subfolders.remove(subfolder)
+        subfolders.sort()
         return subfolders
     except OSError:
         return []
