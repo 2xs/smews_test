@@ -26,10 +26,10 @@ def build_options_to_string(build_options):
 def build(build_options):
     global folder
     try:
-        args = ["scons", "-c"]
+        args = ["scons", "-c", "-j10"]
         test_path = system.chdir(folder)
         system.execute(args)
-        args = ["scons"]
+        args = ["scons", "-j10"]
         for (option,value) in build_options.items():
             args.append("{}={}".format(option,value))
         system.execute(args)
