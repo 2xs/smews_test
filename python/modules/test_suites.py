@@ -3,6 +3,7 @@ from . import smews
 from . import system
 
 folder = "."
+only = []
 
 def get_list():
     global folder
@@ -106,12 +107,18 @@ def get_options_combinations(options_list):
 #####################################################
 
 def get_tests(test_suite, target):
+    global only
     test_suite_folder = get_folder(test_suite)
     tests_path = os.path.join(test_suite_folder, "tests")
     target_specific_tests_path = os.path.join(os.path.join(tests_path,"targets"),target)
     tests = []
-    for test in system.get_executable_list(tests_path):
+    test_scripts = system.get_executable_list(tests_path)
+    target_specific_scripts = system.get_executable_list(target_specific_tests_path)
+    if len(only):
+        test_scripts = list(set(test_scripts) & set(only))
+        target_specific_scripts = list(set(target_specific_scripts) & set(only))
+    for test in test_scripts:
         tests.append(os.path.join(tests_path, test))
-    for test in system.get_executable_list(target_specific_tests_path):
+    for test in target_specific_scripts:
         tests.append(os.path.join(target_specific_tests_path, test))
     return tests

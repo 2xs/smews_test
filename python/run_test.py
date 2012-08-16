@@ -55,7 +55,7 @@ def do_test(test_script, test_suite, build_options):
 
 def do_tests(test_suite, build_options):
     # Get script to execute
-    tests = test_suites.get_tests(test_suite, build_options["target"])
+    tests = test_suites.get_tests(test_suite, build_options["target"])    
     for test in tests:
         do_test(test, test_suite, build_options)
 
@@ -72,7 +72,14 @@ def test_kill(test_suite, build_options):
 
 
 if len(sys.argv) < 2:
-    sys.stderr.write("Usage: {0} <smews_folder> [logfile=<file>] [targets=<target1,...,targetN] [test_suites=ts1,...,tsN]\n".format(sys.argv[0]))
+    sys.stderr.write("Usage: {0} <smews_folder> [logfile=<file>] [targets=<target1,...,targetN] [test_suites=ts1,...,tsN] [tests=test1,...,testN] [disable=<configuration>] [ips=ip1,...,ipN]\n".format(sys.argv[0]))
+    sys.stderr.write("\nOptions list:\n")
+    sys.stderr.write("- logfile: the name of the log file to generate (defaults to 'test.csv')\n")
+    sys.stderr.write("- targets: a comma separated list of targets to test (defaults to all smews available targets)\n")
+    sys.stderr.write("- test_suites: a comma separated list of test_suites to run (defaults to all suites available in 'tests' folder)\n")
+    sys.stderr.write("- tests: a comma separated list of tests script to run (defaults to all tests in the suites)\n")
+    sys.stderr.write("- disable: a comma separated list of disable smews options. This will be used as the *only* tested configuration. (defaults to testing all possible combination of disable options in smews)\n")
+    sys.stderr.write("- ips: a comma separated list ips addresses to build smews with. (defaults to '192.168.100.200' and 'fc23::2')\n")
     sys.exit(1)
 
 # Set needed folder to absolute paths
@@ -87,6 +94,9 @@ test_suites.folder = os.path.join(script_folder, "test_suites")
 
 targets_to_test = []
 test_suites_to_test = []
+disable = []
+
+ips = ["192.168.100.200", "fc23::2"]
 
 for arg in sys.argv[2:]:
     if arg.startswith("targets="):
@@ -96,12 +106,20 @@ for arg in sys.argv[2:]:
         t, e, ts = arg.partition("=")
         test_suites_to_test = ts.split(",")
     if arg.startswith("logfile="):
-        t, e, log = arg.partition("=")
+        l, e, log = arg.partition("=")
         test.log_file = os.path.abspath(log)
+    if arg.startswith("tests="):
+        t, e, tests = arg.partition("=")
+        test_suites.only = tests.split(",")
+    if arg.startswith("disable="):
+        t, e, dis = arg.partition("=")
+        disable = dis.split(",")
+    if arg.startswith("ips="):
+        t, e, iplist = arg.partition("=")
+        ips = iplist.split(",")
 
 
 
-ips = ["192.168.100.200", "fc23::2"]
 
 try:
     test_suites_list = test_suites.get_list()
@@ -117,11 +135,13 @@ try:
         # Copy needed apps to smews folder
         test_suites.copy_apps(test_suite)
         disable_list = test_suites.get_disable_list(test_suite)
+        if len(disable):
+            disable_list = [disable]
         build_options = {}
         for target in targets:
             build_options["target"] = target
             for ip in ips:
-                build_options["ipaddr"] = ip
+                build_options["ipaddr"] = ip                
                 for disable in disable_list:
                     build_options["disable"] = ",".join(disable)
                     build_options["apps"] = ",".join(apps)
