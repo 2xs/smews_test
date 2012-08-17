@@ -3,9 +3,6 @@
 import sys, os
 from modules import *
 
-TEST_SUITES_FOLDER="test_suites"
-
-
 def what(action, test_suite, build_options):
     return "{};{};{}".format(action, test_suite, smews.build_options_to_string(build_options))
 
@@ -127,7 +124,9 @@ try:
     if len(test_suites_to_test):
         test_suites_list = list(set(test_suites_list) & set(test_suites_to_test))
 
+    last_suite = None
     for test_suite in test_suites_list:
+        last_suite = test_suite
         targets = test_suites.get_targets_to_test(test_suite)
         if len(targets_to_test):
             targets = list(set(targets) & set(targets_to_test))
@@ -157,8 +156,11 @@ try:
                                 test_kill(test_suite, build_options)
         # Clean smews folder
         test_suites.remove_apps(test_suite)
+        last_suite = None
 
 except KeyboardInterrupt:
     sys.stderr.write("\nAbording tests\n")
 finally:
+    if (last_suite):
+        test_suites.remove_apps(last_suite)
     test.report(False)
