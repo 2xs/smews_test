@@ -62,7 +62,7 @@ def get_apps():
 def run_script(target, script):
     global folder
     global tools_folder
-    script = os.path.join(os.path.join(tools_folder,target),script)
+    script = os.path.join(tools_folder,target,script)
     args = [script, folder]
     try:
         system.execute(args)

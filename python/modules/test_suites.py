@@ -110,7 +110,7 @@ def get_tests(test_suite, target):
     global only
     test_suite_folder = get_folder(test_suite)
     tests_path = os.path.join(test_suite_folder, "tests")
-    target_specific_tests_path = os.path.join(os.path.join(tests_path,"targets"),target)
+    target_specific_tests_path = os.path.join(tests_path,"targets",target)
     tests = []
     test_scripts = system.get_executable_list(tests_path)
     target_specific_scripts = system.get_executable_list(target_specific_tests_path)
