@@ -52,9 +52,11 @@ is tested. You can tweak a test suite by following means:
 	* `disable=comet`
 	* `disable=post`
 	* `disable=comet,post`
+
    If the `disable` file contains `comet`, then the test will be with:
       	* `disable=comet`
 	* `disable=comet,post`
+
    If the `nodisable` file contains `comet` and there is no `disable` file, the
    builds will be:
         * `disable=`
