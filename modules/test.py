@@ -1,4 +1,4 @@
-import sys,os
+import sys,os,time
 
 __tests = []
 
@@ -24,6 +24,7 @@ def fail(message=None):
 def output_report(message, stderr=False):
     global log_file
     logfile = open(log_file, mode="a+")
+    message = "{};{}".format(time.strftime("%Y-%m-%d %H:%M:%S"), message)
     logfile.write(message)
     if stderr:
         sys.stderr.write(message)
