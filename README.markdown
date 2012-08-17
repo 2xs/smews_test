@@ -20,7 +20,9 @@ Invoking the script
 
 The general form for invoking the script is the following:
 
-> `smews_test <smews_folder> [logfile=<file>] [targets=<target1,...,targetN] [test_suites=ts1,...,tsN] [tests=test1,...,testN] [disable=<configuration>] [ips=ip1,...,ipN]`
+> `smews_test <smews_folder> [logfile=<file>] [targets=<target1,...,targetN] 
+                             [test_suites=ts1,...,tsN] [tests=test1,...,testN] 
+                             [disable=<configuration>] [ips=ip1,...,ipN]`
 
 The first parameter must always be the smews folder (relative or absolute). All
 other parameters are optionals
