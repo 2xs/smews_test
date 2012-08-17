@@ -48,22 +48,19 @@ is tested. You can tweak a test suite by following means:
    that can be disabled in smews are `comet` and `post`, by default, the test
    suite will be run for each of the following build (the `disable=...` thing is
    the scons parameter for building smews):
-
-   	* `disable=`
-	* `disable=comet`
-	* `disable=post`
-	* `disable=comet,post`
+   	*   `disable=`
+	*   `disable=comet`
+	*   `disable=post`
+	*   `disable=comet,post`
 
    If the `disable` file contains `comet`, then the test will be with:
-
-      	* `disable=comet`
-	* `disable=comet,post`
+      	*   `disable=comet`
+	*   `disable=comet,post`
 
    If the `nodisable` file contains `comet` and there is no `disable` file, the
    builds will be:
-
-        * `disable=`
-        * `disable=post`
+        *   `disable=`
+        *   `disable=post`
 
 Adding a new test in a test suite
 =================================
