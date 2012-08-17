@@ -71,6 +71,9 @@ def ip_from_target(ip,target):
     available_targets = smews.get_target_list()
     return ip.format(available_targets.index(target)+10)
 
+def is_v6(ip):
+    return ':' in ip
+
 if len(sys.argv) < 2:
     sys.stderr.write("Usage: {0} <smews_folder> [logfile=<file>] [targets=<target1,...,targetN] [test_suites=ts1,...,tsN] [tests=test1,...,testN] [disable=<configuration>] [ips=ip1,...,ipN]\n".format(sys.argv[0]))
     sys.stderr.write("\nOptions list:\n")
@@ -148,6 +151,8 @@ try:
                 for disable in disable_list:
                     build_options["disable"] = ",".join(disable)
                     build_options["apps"] = ",".join(apps)
+                    if is_v6(ip):
+                        build_options["apps"] = build_options["apps"] + "," + "icmpv6"
                     # Build smews
                     if test_build(test_suite, build_options):
                         # Flash to device
