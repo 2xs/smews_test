@@ -1,1 +1,9 @@
-../../../targets/linux/kill
+#!/bin/bash
+
+dir=`cd \`dirname $0\` && pwd`
+echo $dir >> /tmp/kill_log
+while $dir/is_alive
+do
+    sudo pkill smews.elf
+done
+! $dir/is_alive

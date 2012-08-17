@@ -5,7 +5,7 @@ set -e
 SMEWS_FOLDER=$1
 
 MBED_PATH=`mount -l | grep MBED | cut -d\  -f3 | head -1`
-cp $SMEWS_FOLDER/bin/mbed_ethernet/smews.bin $MBED_PATH && sync && sleep 1
+cp $SMEWS_FOLDER/bin/mbed_ethernet/smews.bin $MBED_PATH && sync 
 
 MBED_TTY=`ls /dev/ttyACM? | head -1`
 send_break $MBED_TTY

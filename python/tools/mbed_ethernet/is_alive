@@ -1,1 +1,3 @@
-../../../targets/mbed_ethernet/is_alive
+#!/bin/bash
+
+exit 0

@@ -1,1 +1,5 @@
-../../../targets/mbed_ethernet/launch
+#!/bin/bash
+set -e
+MBED_TTY=`ls /dev/ttyACM? | head -1`
+send_break $MBED_TTY
+sleep 3

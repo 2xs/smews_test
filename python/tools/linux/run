@@ -1,1 +1,8 @@
-../../../targets/linux/launch
+#!/bin/bash
+
+SMEWS_FOLDER=$1
+
+test -x $SMEWS_FOLDER/bin/linux/smews.elf || exit 1
+
+sudo $SMEWS_FOLDER/bin/linux/smews.elf &
+exit 0
