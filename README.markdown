@@ -1,5 +1,5 @@
-Smews shell based test framework
-================================
+Smews test framework
+====================
 
 This repository allows building and checking smews.
 The main script is the smews_test script. It takes one mandatory parameter,
@@ -14,6 +14,29 @@ ipv6. For each configuration, it will:
 3. Perform all test in the tests folder of the test suite
 4. Perform all target dependent tests in the `tests/targets/<target>` folder of the test suite
 
+
+Invoking the script
+===================
+
+The general form for invoking the script is the following:
+
+> `smews_test <smews_folder> [logfile=<file>] [targets=<target1,...,targetN] [test_suites=ts1,...,tsN] [tests=test1,...,testN] [disable=<configuration>] [ips=ip1,...,ipN]`
+
+The first parameter must always be the smews folder (relative or absolute). All
+other parameters are optionals
+
+*  `logfile` a file name where to ouput the test reports. This output is done in *csv* format. Defaults to `test.csv`. *Warning* the script does not overwrite the log file, it always append at the end of the file,
+*  `targets` is a comma separated list of targets. Only those targets will be tested. Defaults to all targets,
+*  `test_suites` is a comma separated list of test suites to perform. Defaults to all test suites,
+*  `tests` is a comma separated list of tests to perform. Defaults to all tests,
+*  `disable` is a value for disable options. Thus, only *this* configuration
+   willl be tested. *Warning* it completly overrides all `disable` and
+   `nodisable` files of the test suites. Defaults to test all possible combinations,
+*  `ips` is a list of ips to build. If the `{}` string is included in an IP
+   address, it will be replaced by a number between `11` and `11 + #targets`
+   where `#targets` is the number of smews targets. This allows multiple
+   targets to be connected to the same test platform without getting same IPs
+   on the same LAN. Defaults to `192.168.100.{}` and `fc23::{}`
 
 Adding a new test suite
 =======================

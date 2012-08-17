@@ -67,6 +67,9 @@ def test_kill(test_suite, build_options):
     return False
 
 
+def ip_from_target(ip,target):
+    available_targets = smews.get_target_list()
+    return ip.format(available_targets.index(target)+10)
 
 if len(sys.argv) < 2:
     sys.stderr.write("Usage: {0} <smews_folder> [logfile=<file>] [targets=<target1,...,targetN] [test_suites=ts1,...,tsN] [tests=test1,...,testN] [disable=<configuration>] [ips=ip1,...,ipN]\n".format(sys.argv[0]))
@@ -76,7 +79,7 @@ if len(sys.argv) < 2:
     sys.stderr.write("- test_suites: a comma separated list of test_suites to run (defaults to all suites available in 'tests' folder)\n")
     sys.stderr.write("- tests: a comma separated list of tests script to run (defaults to all tests in the suites)\n")
     sys.stderr.write("- disable: a comma separated list of disable smews options. This will be used as the *only* tested configuration. (defaults to testing all possible combination of disable options in smews)\n")
-    sys.stderr.write("- ips: a comma separated list ips addresses to build smews with. (defaults to '192.168.100.200' and 'fc23::2')\n")
+    sys.stderr.write("- ips: a comma separated list ips addresses to build smews with. If {} is used in the string, it will be replaced by a different number for each target. (defaults to '192.168.100.{}' and 'fc23::{}')\n")
     sys.exit(1)
 
 # Set needed folder to absolute paths
@@ -93,7 +96,7 @@ targets_to_test = []
 test_suites_to_test = []
 disable = []
 
-ips = ["192.168.100.200", "fc23::2"]
+ips = ["192.168.100.{}", "fc23::{}"]
 
 for arg in sys.argv[2:]:
     if arg.startswith("targets="):
@@ -140,6 +143,7 @@ try:
         for target in targets:
             build_options["target"] = target
             for ip in ips:
+                ip = ip_from_target(ip, target)
                 build_options["ipaddr"] = ip                
                 for disable in disable_list:
                     build_options["disable"] = ",".join(disable)
