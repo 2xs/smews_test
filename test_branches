@@ -20,6 +20,7 @@ for b in $BRANCHES
 do
     local_branch=`echo $b | cut -d/ -f3-`
     # switch to branch
+    git branch -D $local_branch
     git checkout -t $b
     # update branch
     git pull
