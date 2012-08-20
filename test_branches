@@ -1,13 +1,15 @@
 #!/bin/bash
 
 SCRIPT_FOLDER=`cd \`dirname $0\` && pwd`
-LOG_FOLDER=$SCRIPT_FOLDER
+LOG_FOLDER=$SCRIPT_FOLDER/logs
 SMEWS_FOLDER=$1
 SMEWS_URL=git://github.com/2xs/smews.git
 
 # Ensure smews is present
 test -d $SMEWS_FOLDER || git clone $SMEWS_URL $SMEWS_FOLDER || exit 1
 test -f $SMEWS_FOLDER/SConstruct || exit 2
+
+mkdir -p $LOG_FOLDER
 
 SMEWS_FOLDER=`cd $SMEWS_FOLDER && pwd` # get absolute path
 
