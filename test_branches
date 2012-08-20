@@ -18,7 +18,7 @@ for b in $BRANCHES
 do
     local_branch=`echo $b | cut -d/ -f3-`
     # switch to branch
-    git checkout -B $local_branch $b
+    git checkout -t $b
     # update branch
     git pull
     # Check if test has already been run
@@ -26,7 +26,7 @@ do
     if ! test -f $LOG_FOLDER/*-$HASH.csv
     then
 	# Run tests
-	$SCRIPT_FOLDER/smews_test $SMEWS_FOLDER logfile=$LOG_FOLDER/`date +%Y%m%d%H%M%s`-$HASH.csv
+	$SCRIPT_FOLDER/smews_test $SMEWS_FOLDER logfile=$LOG_FOLDER/$local_branch-`date +%Y%m%d%H%M%s`-$HASH.csv
     fi
 done
 
