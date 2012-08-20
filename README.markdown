@@ -121,6 +121,42 @@ folder. The folder name is the one used by smews in its target folder
 3. `kill` stops the smews server on the target,
 4. `run` run smews on the target
 
+
+Advanced filters
+================
+
+Advanced filters can be used to validate and modify a configuration before it
+is built and tested. You can have a global filter and per test suites
+filters. 
+
+The main goal behind is to avoid tests that fail not because of an error, but
+because of a *normal* incompatible configuration.  For example, the
+`mbed_ethernet` target *needs* the `icmpv6` app to be built when the ip is set
+to an IPv6 one. The provided advanced filter will automatically add this
+application if the test framework generates a configuration for `mbed_ethernet`
+target with IPv6. Furthermore, if the `icmpv6` application has to be included,
+then Smews *can not* be built without support for generic purpose ip
+handler. Thus, the provided global filter will tell the framework to discard a
+configuration where the `icmpv6` application is included *and* the
+`general_purpose_ip_handler` disable option is set.
+
+An advanced filter consist in a python script called `filter.py` that defines a
+function `filter(build_options)`, the `build_options` parameter beeing a
+associative array (`dict`) of build configuration value. The key of the array
+is the scons option name (*i.e.* `disable`, `ipaddr`, `target`...) and the
+value is a string representing the value of the option (if the option is
+multivalued, the string is a comma separated list). The function can manipulate
+the `build_options` array (*i.e.* modify values, remove values, add values) and
+must return `True` if the build configuration is valid (and should be tested)
+and `False` if it is incompatible by design and thus not be tested.
+
+
+The `filter.py` scripts must be located at the root of a test suite folder to
+be loaded and run for this particular test suite. A global filter is provided
+and is located at the root of the `test_suites` folder. The global filter is
+*always* called *before* the test suite specific one.
+
+
 FAQ
 ===
 `How can I use an application only for some targets ?`
