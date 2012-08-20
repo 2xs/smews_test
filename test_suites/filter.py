@@ -1,3 +1,7 @@
+# Returns a list of targets that need icmpv6 if built with ipv6
+# For example, linux target does not need it as it uses a tun interface
+# so it can be tested locally without the need to answer neighbor solicitation
+# messages
 def icmpv6_needed():
     return ['mbed_ethernet']
 
@@ -25,5 +29,4 @@ def filter(build_options):
         if build_options["target"] in icmpv6_needed():
             build_options["apps"] += ",icmpv6"
     
-    print(build_options)
     return validate_build(build_options)
