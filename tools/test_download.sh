@@ -30,4 +30,4 @@ then
     exit 0
 fi
 
-exit 1
+exit $HTTP_CODE
