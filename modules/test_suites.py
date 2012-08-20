@@ -1,4 +1,4 @@
-import os
+import os,sys
 from . import smews
 from . import system
 
@@ -122,3 +122,14 @@ def get_tests(test_suite, target):
     for test in target_specific_scripts:
         tests.append(os.path.join(target_specific_tests_path, test))
     return tests
+
+# Tries to import filter.py and call the filter function
+def filter(test_suite, build_options):
+    try:
+        folder = get_folder(test_suite)
+        filter = system.import_module(folder, "filter")
+        val = filter.filter(build_options)
+        system.unload_module("filter")
+        return val
+    except ImportError as e:
+        return True # No filter script, so build is valid anyhow

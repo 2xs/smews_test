@@ -1,5 +1,5 @@
 import subprocess
-import os
+import os,sys
 import stat
 import fileinput
 
@@ -71,3 +71,14 @@ def get_file_lines(file_path):
     except IOError:
         return []
 ####################################################
+
+
+def import_module(path, module):
+    sys.path.append(path)
+    mod = __import__(module)
+    sys.path.remove(path)
+    return mod
+
+def unload_module(module):
+    del(sys.modules[module])
+

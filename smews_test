@@ -74,6 +74,27 @@ def ip_from_target(ip,target):
 def is_v6(ip):
     return ':' in ip
 
+def do_test_build(test_suite, build_options):
+    # Global filter (for all suites)
+    if not test_suites.filter(".", build_options):
+        return
+    # Suite specific filter
+    if not test_suites.filter(test_suite, build_options):
+        return
+    # Build smews
+    if test_build(test_suite, build_options):
+        # Flash to device
+        if test_program(test_suite, build_options):
+            # Run smews
+            if test_run(test_suite, build_options):
+                # Executes tests
+                do_tests(test_suite, build_options)
+                # Kill
+                test_kill(test_suite, build_options)
+
+
+
+
 if len(sys.argv) < 2:
     sys.stderr.write("Usage: {0} <smews_folder> [logfile=<file>] [targets=<target1,...,targetN] [test_suites=ts1,...,tsN] [tests=test1,...,testN] [disable=<configuration>] [ips=ip1,...,ipN]\n".format(sys.argv[0]))
     sys.stderr.write("\nOptions list:\n")
@@ -151,18 +172,7 @@ try:
                 for disable in disable_list:
                     build_options["disable"] = ",".join(disable)
                     build_options["apps"] = ",".join(apps)
-                    if is_v6(ip):
-                        build_options["apps"] = build_options["apps"] + "," + "icmpv6"
-                    # Build smews
-                    if test_build(test_suite, build_options):
-                        # Flash to device
-                        if test_program(test_suite, build_options):
-                            # Run smews
-                            if test_run(test_suite, build_options):
-                                # Executes tests
-                                do_tests(test_suite, build_options)
-                                # Kill
-                                test_kill(test_suite, build_options)
+                    do_test_build(test_suite, build_options)
         # Clean smews folder
         test_suites.remove_apps(test_suite)
         last_suite = None
@@ -173,3 +183,8 @@ finally:
     if (last_suite):
         test_suites.remove_apps(last_suite)
     test.report(False)
+
+
+# Local Variables:
+# mode: python
+# End:
