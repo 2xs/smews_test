@@ -173,6 +173,7 @@ try:
                     build_options["disable"] = ",".join(disable)
                     build_options["apps"] = ",".join(apps)
                     do_test_build(test_suite, build_options)
+                    test.report(False)
         # Clean smews folder
         test_suites.remove_apps(test_suite)
         last_suite = None

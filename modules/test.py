@@ -31,7 +31,9 @@ def output_report(message, stderr=False):
     logfile.close()
 
 def report(full=False):
-    global __tests
+    global __tests,log_file
+    logfile = open(log_file,"w")
+    logfile.close()
     print("")
     success = 0
     for test in __tests:
