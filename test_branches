@@ -29,7 +29,7 @@ do
     if ! test -f $LOG_FOLDER/*-$HASH.csv
     then
 	# Run tests
-	$SCRIPT_FOLDER/smews_test $SMEWS_FOLDER logfile=$LOG_FOLDER/$local_branch-`date +%Y%m%d%H%M%s`-$HASH.csv
+	$SCRIPT_FOLDER/smews_test $SMEWS_FOLDER logfile=$LOG_FOLDER/$local_branch-`date +%Y%m%d%H%M%S`-$HASH.csv
     fi
 done
 
