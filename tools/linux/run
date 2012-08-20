@@ -4,5 +4,4 @@ SMEWS_FOLDER=$1
 
 test -x $SMEWS_FOLDER/bin/linux/smews.elf || exit 1
 
-sudo $SMEWS_FOLDER/bin/linux/smews.elf &
-exit 0
+sudo -b $SMEWS_FOLDER/bin/linux/smews.elf
