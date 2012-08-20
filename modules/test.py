@@ -6,11 +6,12 @@ log_file = "test.csv"
 
 def begin(target, what):
     global __tests
-    __tests.append({"target": target, "what": what, "success": False, "why": "Unknow reason"})
+    __tests.append({"time": time.strftime("%Y-%m-%d %H:%M:%S"), "target": target, "what": what, "success": False, "why": "Unknow reason"})
 
 def success():
     global __tests
     __tests[len(__tests)-1]["success"] = True
+    __tests[len(__tests)-1]["time"] = time.strftime("%Y-%m-%d %H:%M:%S")
     sys.stdout.write(".")
     sys.stdout.flush()
 
@@ -18,13 +19,13 @@ def fail(message=None):
     global __tests
     if message:
         __tests[len(__tests)-1]["why"] = message
+    __tests[len(__tests)-1]["time"] = time.strftime("%Y-%m-%d %H:%M:%S")
     sys.stdout.write("X")
     sys.stdout.flush()
 
 def output_report(message, stderr=False):
     global log_file
     logfile = open(log_file, mode="a+")
-    message = "{};{}".format(time.strftime("%Y-%m-%d %H:%M:%S"), message)
     logfile.write(message)
     if stderr:
         sys.stderr.write(message)
@@ -38,9 +39,9 @@ def report(full=False):
     success = 0
     for test in __tests:
         if not test["success"]:
-            output_report("FAIL;{};{};{}\n".format(test["target"], test["what"], test["why"]), True)
+            output_report("{};FAIL;{};{};{}\n".format(test["time"],test["target"], test["what"], test["why"]), True)
         else:
-            output_report("SUCCESS;{};{}\n".format(test["target"], test["what"]), full)
+            output_report("{};SUCCESS;{};{}\n".format(test["time"],test["target"], test["what"]), full)
             success = success + 1
     if not len(__tests):
         print("No test performed")
