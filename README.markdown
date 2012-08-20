@@ -148,7 +148,7 @@ value is a string representing the value of the option (if the option is
 multivalued, the string is a comma separated list). The function can manipulate
 the `build_options` array (*i.e.* modify values, remove values, add values) and
 must return `True` if the build configuration is valid (and should be tested)
-and `False` if it is incompatible by design and thus not be tested.
+and `False` if it is incompatible by design and thus not to be tested.
 
 
 The `filter.py` scripts must be located at the root of a test suite folder to
@@ -160,4 +160,10 @@ and is located at the root of the `test_suites` folder. The global filter is
 FAQ
 ===
 `How can I use an application only for some targets ?`
-> The only way is to create a dedicated test suite with the application and the corresponding targets listed in the `target` or `notarget`. If needed, you can simlink tests from other test suites to avoid re-writing them
+
+> One way is to create a dedicated test suite with the application and the
+  corresponding targets listed in the `target` or `notarget`. If needed, you
+  can simlink tests from other test suites to avoid re-writing them.
+
+> A better way would be to use an advanced filter that checks the target and
+  adds or removes a particular application for a given target.
