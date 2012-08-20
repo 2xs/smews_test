@@ -14,9 +14,10 @@ then
 fi
 
 HTTP_CODE=`$CURL http://$ip_addr/$2`
-if [ $? -ne 0 ]
+CURL_EXIT_CODE=$?
+if [ $CURL_EXIT_CODE -ne 0 ]
 then
-    exit 1
+    exit $CURL_EXIT_CODE
 fi
 
 REQUEST_CODE=$3
@@ -30,4 +31,4 @@ then
     exit 0
 fi
 
-exit $HTTP_CODE
+exit 100
