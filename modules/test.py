@@ -23,7 +23,7 @@ def fail(message=None):
     sys.stdout.write("X")
     sys.stdout.flush()
 
-def output_report(message, stderr=False):
+def output_report(message, stderr):
     global log_file
     logfile = open(log_file, mode="a+")
     logfile.write(message)
@@ -31,7 +31,7 @@ def output_report(message, stderr=False):
         sys.stderr.write(message)
     logfile.close()
 
-def report(full=False):
+def report(printfail=False, printsuccess=False):
     global __tests,log_file
     if not len(__tests):
         return
@@ -41,9 +41,9 @@ def report(full=False):
     success = 0
     for test in __tests:
         if not test["success"]:
-            output_report("{};FAIL;{};{};{}\n".format(test["time"],test["target"], test["what"], test["why"]), True)
+            output_report("{};FAIL;{};{};{}\n".format(test["time"],test["target"], test["what"], test["why"]), printfail)
         else:
-            output_report("{};SUCCESS;{};{}\n".format(test["time"],test["target"], test["what"]), full)
+            output_report("{};SUCCESS;{};{}\n".format(test["time"],test["target"], test["what"]), printsuccess)
             success = success + 1
     print("{}/{} tests passed ({:.2f} %)".format(success, len(__tests), success / len(__tests) * 100))
 #####################################################

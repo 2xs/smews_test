@@ -173,7 +173,7 @@ try:
                     build_options["disable"] = ",".join(disable)
                     build_options["apps"] = ",".join(apps)
                     do_test_build(test_suite, build_options)
-                    test.report(False)
+                    test.report()
         # Clean smews folder
         test_suites.remove_apps(test_suite)
         last_suite = None
@@ -183,7 +183,7 @@ except KeyboardInterrupt:
 finally:
     if (last_suite):
         test_suites.remove_apps(last_suite)
-    test.report(False)
+    test.report(printfail=True)
 
 
 # Local Variables:
