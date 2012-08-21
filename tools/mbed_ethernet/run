@@ -2,4 +2,4 @@
 set -e
 MBED_TTY=`ls /dev/ttyACM? | head -1`
 send_break $MBED_TTY
-sleep 3
+sleep 4
