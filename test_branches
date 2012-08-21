@@ -5,33 +5,168 @@ LOG_FOLDER=$SCRIPT_FOLDER/logs
 SMEWS_FOLDER=$1
 SMEWS_URL=git://github.com/2xs/smews.git
 
-# Ensure smews is present
-test -d $SMEWS_FOLDER || git clone $SMEWS_URL $SMEWS_FOLDER || exit 1
-test -f $SMEWS_FOLDER/SConstruct || exit 2
 
-mkdir -p $LOG_FOLDER
+function check_folders()
+{
+    # Ensure smews is present
+    test -d $SMEWS_FOLDER || git clone $SMEWS_URL $SMEWS_FOLDER || exit 1
+    test -f $SMEWS_FOLDER/SConstruct || exit 2
+    
+    mkdir -p $LOG_FOLDER
+    SMEWS_FOLDER=`cd $SMEWS_FOLDER && pwd` # get absolute path
+}
 
-SMEWS_FOLDER=`cd $SMEWS_FOLDER && pwd` # get absolute path
+function run_tests()
+{
+    check_folders
 
-cd $SMEWS_FOLDER
-BRANCHES=`cd $SMEWS_FOLDER && git branch -a | grep origin | grep -v HEAD | sed 's/\*//g'`
-echo $BRANCHES
-for b in $BRANCHES
-do
-    local_branch=`echo $b | cut -d/ -f3-`
-    # switch to branch
-    git branch -D $local_branch
-    git checkout -t $b
-    # update branch
-    git pull
-    # Check if test has already been run
-    HASH=`git log --oneline --no-abbrev | cut -d\  -f1 | head -1`
-    if ! test -f $LOG_FOLDER/*-$HASH.csv
-    then
+    cd $SMEWS_FOLDER
+    BRANCHES=`cd $SMEWS_FOLDER && git branch -a | grep origin | grep -v HEAD | sed 's/\*//g'`
+    echo $BRANCHES
+    for b in $BRANCHES
+    do
+	local_branch=`echo $b | cut -d/ -f3-`
+        # switch to branch
+	git branch -D $local_branch
+	git checkout -t $b
+        # update branch
+	git pull
+        # Check if test has already been run
+	HASH=`git log --oneline --no-abbrev | cut -d\  -f1 | head -1`
+	LOG_FILE=$local_branch-`date +%Y%m%d%H%M%S`-$HASH.csv
+	LOG_FILE=`echo $LOG_FILE | sed s@/@_@`
+	if ! test -f $LOG_FOLDER/*-$HASH.csv
+	then
 	# Run tests
-	$SCRIPT_FOLDER/smews_test $SMEWS_FOLDER logfile=$LOG_FOLDER/$local_branch-`date +%Y%m%d%H%M%S`-$HASH.csv
-    fi
+	    $SCRIPT_FOLDER/smews_test $SMEWS_FOLDER logfile=$LOG_FOLDER/$LOG_FILE
+	fi
+    done
+}
+
+function generate_html()
+{
+    logfile=$1
+    htmlfile=$2
+
+    # target list
+    targets=`cat $logfile | cut -d\; -f3 | sort | uniq`
+    test_suites=`cat $logfile | cut -d\; -f5 | sort | uniq`
+    tests=`cat $logfile | cut -d\; -f4 | sort | uniq`
+
+    cat > $htmlfile <<EOF
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script type="text/javascript" src="./jquery.js"></script>
+  <script type="text/javascript">
+     function filter(box)
+     {
+        if (box.checked)
+           \$("." + box.name).css('display', '');
+        else
+           \$("." + box.name).css('display', 'none');
+     }
+  </script>
+  <title>$logfile</title>
+  <style type="text/css">
+    <!--
+    body{
+       font-family: "Monospace";
+       font-size: 10px;
+    }
+    table { 
+       border-collapse: collapse;
+    }
+    table, th,td {
+       border: 1px solid black;
+    }
+    th {
+      background-color: #777777;
+      color: white;
+    }
+    .SUCCESS {
+       background-color: #B4EEB4;
+    }
+    .FAIL {
+       background-color: #EEB6B4;
+    }
+    -->
+  </style>
+</head>
+EOF
+
+    cat >> $htmlfile <<EOF
+<body>
+<h1>Results for `basename $logfile`</h1>
+<form>
+<strong>Test result:</strong> <input type="checkbox" name="FAIL" value="FAIL" checked="checked" onclick="filter(this);"/> FAIL
+<input type="checkbox" name="SUCCESS" value="SUCCESS" checked="checked" onclick="filter(this);"/> SUCCESS <br />
+<strong>Targets:</strong>
+EOF
+
+    for t in $targets
+    do
+	echo "<input type=\"checkbox\" name=\"$t\" value=\"$t\" checked=\"checked\" onclick=\"filter(this);\" />$t" >> $htmlfile
+    done
+
+cat >> $htmlfile <<EOF
+<br /> <strong>Test suites:</strong>
+EOF
+    for ts in $test_suites
+    do
+	echo "<input type=\"checkbox\" name=\"$ts\" value=\"$ts\" checked=\"checked\" onclick=\"filter(this);\"/>$ts" >> $htmlfile
+    done
+cat >> $htmlfile <<EOF
+<br />
+<strong>Tests:</strong>
+EOF
+    for t in $tests
+    do
+	echo "<input type=\"checkbox\" name=\"$t\" value=\"$t\" checked=\"checked\" onclick=\"filter(this);\"/>$t" >> $htmlfile
+    done
+
+cat >> $htmlfile <<EOF
+</form>
+<table>
+  <tr>
+    <th>Test date</th><th>Test result</th><th>Target</th><th>Test suite</th><th>Test</th><th>Build configuration</th><th>Error message</th>
+  </tr>
+EOF
+    cat $logfile | while IFS=';' read time result target test test_suite configuration error
+    do
+	cat >> $htmlfile <<EOF
+   <tr class="$result $target $test $test_suite">
+      <td>$time</td>
+      <td>$result</td>
+      <td>$target</td>
+      <td>$test_suite</td>
+      <td>$test</td>
+      <td>$configuration</td>
+      <td>$error</td>
+   </tr>
+EOF
+    done
+    echo "</table>" >> $htmlfile
+    echo "</body>" >> $htmlfile
+}
+
+check_folders
+run_tests
+
+echo "" > $LOG_FOLDER/index.html
+
+echo "<ul>" >> $LOG_FOLDER/index.html
+# Generate HTML output
+for log in $LOG_FOLDER/*.csv
+do
+    logname=`basename $log`
+    html=`basename $log .csv`.html
+    echo "<li> <a href=\"$html\">$logname</a>" >> $LOG_FOLDER/index.html
+
+    generate_html $log $LOG_FOLDER/$html
 done
+echo "</ul>" >> $LOG_FOLDER/index.html
 
 
 # Local Variables:

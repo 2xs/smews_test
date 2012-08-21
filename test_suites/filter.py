@@ -23,6 +23,10 @@ def filter(build_options):
     # Modify the configuration if needed (for example, include the icmpv6 app when needed)
     # If a filter returns true, the test can be performed, otherwise, it is an incompatible test
     # so it will not be performed
+
+    # skeleton is not a real target
+    if build_options["target"] == "skeleton":
+        return False
     
     # First, check if we are in ipv6, and, if so, check if the target needs the icmpv6 app to work
     if is_v6(build_options["ipaddr"]):

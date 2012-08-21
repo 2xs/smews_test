@@ -33,9 +33,11 @@ def output_report(message, stderr=False):
 
 def report(full=False):
     global __tests,log_file
+    if not len(__tests):
+        return
+    print("")
     logfile = open(log_file,"w")
     logfile.close()
-    print("")
     success = 0
     for test in __tests:
         if not test["success"]:
@@ -43,8 +45,5 @@ def report(full=False):
         else:
             output_report("{};SUCCESS;{};{}\n".format(test["time"],test["target"], test["what"]), full)
             success = success + 1
-    if not len(__tests):
-        print("No test performed")
-    else:
-        print("{}/{} tests passed ({:.2f} %)".format(success, len(__tests), success / len(__tests) * 100))
+    print("{}/{} tests passed ({:.2f} %)".format(success, len(__tests), success / len(__tests) * 100))
 #####################################################
