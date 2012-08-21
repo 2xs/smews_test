@@ -5,7 +5,7 @@
 # $3: expected http code (200 if omitted)
 # return true if the expected http code is returned by smews
 
-CURL="curl -s -S -g --connect-timeout 2 --max-time 3 -o /dev/null -w %{http_code}"
+CURL="curl -s -S -g --connect-timeout 3 --retry 2 --max-time 3 -o /dev/null -w %{http_code}"
 
 ip_addr=$1
 if echo $ip_addr | grep -q ':'
