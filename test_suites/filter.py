@@ -19,7 +19,7 @@ def validate_build(build_options):
 
 def discard_targets():
     """List of targets that must not be tested yet"""
-    return ['WSN430wireless', 'GBA', 'WSN430', 'MicaZWireless', 'cygwin','WSN430']
+    return ['WSN430wireless', 'GBA', 'WSN430', 'MicaZWireless', 'cygwin','WSN430','skeleton']
 
 def filter(build_options):
     # This is the global filter for smews tests.
