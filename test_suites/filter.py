@@ -17,6 +17,10 @@ def validate_build(build_options):
         return not "general_purpose_ip_handler" in build_options["disable"]
     return True
 
+def discard_targets():
+    """List of targets that must not be tested yet"""
+    return ['WSN430wireless', 'GBA', 'WSN430', 'MicaZWireless', 'cygwin','WSN430']
+
 def filter(build_options):
     # This is the global filter for smews tests.
     # It will perform some tests depending on the configuration, 
@@ -25,7 +29,7 @@ def filter(build_options):
     # so it will not be performed
 
     # skeleton is not a real target
-    if build_options["target"] == "skeleton":
+    if build_options["target"] in discard_targets():
         return False
     
     # First, check if we are in ipv6, and, if so, check if the target needs the icmpv6 app to work
