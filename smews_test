@@ -68,11 +68,22 @@ def test_kill(test_suite, build_options):
 
 
 def ip_from_target(ip,target):
+    if ip == "ipv4":
+        if "slip" in target:
+            ip="192.168.1.{}"
+        elif "ethernet" in target:
+            ip="192.168.100.{}"
+        else:
+            ip="192.168.2.{}"
+    if ip == "ipv6":
+        if "slip" in target:
+            ip="fd23::{}"
+        elif "ethernet" in target:
+            ip="fc23::{}"
+        else:
+            ip="fe23::{}"
     available_targets = smews.get_target_list()
     return ip.format(available_targets.index(target)+10)
-
-def is_v6(ip):
-    return ':' in ip
 
 def do_test_build(test_suite, build_options):
     # Global filter (for all suites)
@@ -103,7 +114,7 @@ if len(sys.argv) < 2:
     sys.stderr.write("- test_suites: a comma separated list of test_suites to run (defaults to all suites available in 'tests' folder)\n")
     sys.stderr.write("- tests: a comma separated list of tests script to run (defaults to all tests in the suites)\n")
     sys.stderr.write("- disable: a comma separated list of disable smews options. This will be used as the *only* tested configuration. (defaults to testing all possible combination of disable options in smews)\n")
-    sys.stderr.write("- ips: a comma separated list ips addresses to build smews with. If {} is used in the string, it will be replaced by a different number for each target. (defaults to '192.168.100.{}' and 'fc23::{}')\n")
+    sys.stderr.write("- ips: a comma separated list of ip to test. If 'ipv4' or 'ipv6' are used, ip is determined from target. If a real ip is used, then the first occurence of {} will be replaced by a number depending on target\n")
     sys.exit(1)
 
 # Set needed folder to absolute paths
@@ -120,7 +131,7 @@ targets_to_test = []
 test_suites_to_test = []
 disable = []
 
-ips = ["192.168.100.{}", "fc23::{}"]
+ips = ["ipv4", "ipv6"]
 
 for arg in sys.argv[2:]:
     if arg.startswith("targets="):
