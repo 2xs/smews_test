@@ -1,0 +1,6 @@
+#!/bin/bash
+
+PAN_MANAGER_FOLDER=$HOME/bin/panManager
+
+cd $PAN_MANAGER_FOLDER
+sudo -b ./panManager $*

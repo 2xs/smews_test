@@ -1,0 +1,16 @@
+#!/bin/bash
+IP=$2
+
+if echo $IP | grep -q ':'
+then
+    IP=`echo $IP | sed s/:[a-f0-9]*$//`:ab
+else
+    IP=`echo $IP | sed s/\.[0-9]*$//`.254
+fi
+
+set -e
+MBED_TTY=`ls /dev/ttyACM? | head -1`
+send_break $MBED_TTY
+sleep 4
+
+launch_panManager slip $IP/24 -p $MBED_TTY

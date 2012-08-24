@@ -68,7 +68,7 @@ static char init_dynamic_large(void)
 static char get_dynamic_large(struct args_t *args)
 {
     uint32_t i = 0;
-    uint16_t size = 1000;
+    uint16_t size = 100;
 
     if (size == 0)
 	out_c('0');

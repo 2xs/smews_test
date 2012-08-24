@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+MBED_PATH=`mount -l | grep MBED | cut -d\  -f3 | head -1`
+echo "X" > $MBED_PATH/null.bin && sync
+
+MBED_TTY=`ls /dev/ttyACM? | head -1`
+send_break $MBED_TTY
+
+kill_panManager
+
+exit 0

@@ -59,11 +59,13 @@ def get_apps():
     global folder
     return system.get_subfolder_list(get_apps_folder())
 
-def run_script(target, script):
+def run_script(target, script, ip=None):
     global folder
     global tools_folder
     script = os.path.join(tools_folder,target,script)
     args = [script, folder]
+    if ip:
+        args.append(ip)
     try:
         system.execute(args)
     except system.ExecutionError as e:
@@ -73,8 +75,8 @@ def run_script(target, script):
 def program(target):
     run_script(target, "program")
 
-def run(target):
-    run_script(target, "run")
+def run(target, ip):
+    run_script(target, "run", ip)
 
 def kill(target):
     run_script(target, "kill")
