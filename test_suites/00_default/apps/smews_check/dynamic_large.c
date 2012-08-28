@@ -39,11 +39,9 @@
 </generator>
  */
 
-#ifdef DEV_MTU
-#define ARRAY_SIZE ((DEV_MTU-150) < 0 ? OUTPUT_BUFFER_SIZE : (DEV_MTU-150))
-#else
-#define ARRAY_SIZE OUTPUT_BUFFER_SIZE
-#endif
+
+#include "dynamic.h"
+
 
 static char array[ARRAY_SIZE];
 
