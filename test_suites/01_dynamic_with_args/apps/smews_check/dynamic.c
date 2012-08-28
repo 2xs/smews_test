@@ -42,10 +42,14 @@
 </generator>
  */
 
-#ifdef DEV_MTU
-#define ARRAY_SIZE ((DEV_MTU-150) < 0 ? OUTPUT_BUFFER_SIZE : (DEV_MTU-150))
+#ifndef TEST_ARRAY_SIZE
+  #ifdef DEV_MTU
+    #define ARRAY_SIZE ((DEV_MTU-150) < 0 ? OUTPUT_BUFFER_SIZE : (DEV_MTU-150))
+  #else
+    #define ARRAY_SIZE OUTPUT_BUFFER_SIZE
+  #endif
 #else
-#define ARRAY_SIZE OUTPUT_BUFFER_SIZE
+  #define ARRAY_SIZE TEST_ARRAY_SIZE
 #endif
 
 static char array[ARRAY_SIZE];
