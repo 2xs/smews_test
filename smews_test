@@ -132,6 +132,8 @@ test_suites_to_test = []
 disable = []
 
 ips = ["ipv4", "ipv6"]
+errorfile = "error.log"
+
 
 for arg in sys.argv[2:]:
     if arg.startswith("targets="):
@@ -152,8 +154,10 @@ for arg in sys.argv[2:]:
     if arg.startswith("ips="):
         t, e, iplist = arg.partition("=")
         ips = iplist.split(",")
+    if arg.startswith("errorlog="):
+        k,e,errorfile = arg.partition("=")
 
-
+system.create_logfile(os.path.join(script_folder, errorfile))
 
 
 try:

@@ -3,6 +3,8 @@ import os,sys
 import stat
 import fileinput
 
+logfile = "error.log"
+
 class SystemError(Exception):
     def __init__(self, message):
         self.message = message
@@ -12,9 +14,15 @@ class ExecutionError(SystemError):
         self.message = "Execution Error: {}".format(message)
 
 def execute(args):
+    global logfile
     try:
-        devnull = open(os.devnull, mode="a+")
-        subprocess.check_call(args, stdout=devnull, stderr=devnull)
+        errorlog = open(logfile, "a+")
+        devnull = open(os.devnull,"a+")
+        errorlog.write("##################### Execution of {} ######################\n".format(args))
+    except IOError:
+        errorlog = open(os.devnull, "a+")
+    try:
+        subprocess.check_call(args, stdout=devnull, stderr=errorlog)
     except subprocess.CalledProcessError as e:
         raise ExecutionError("{} returned {}".format(args, e.returncode))
     except OSError:
@@ -25,6 +33,16 @@ def chdir(path):
     os.chdir(path)
     return current_path
 #####################################################    
+
+
+def create_logfile(lfile):
+    global logfile
+    logfile = lfile
+    try:
+        log = open(logfile,"w")
+        log.close()
+    except IOError:
+        sys.stderr.write("Failed to create {}\n".format(logfile))
 
 
 def get_executable_list(folder):
