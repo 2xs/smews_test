@@ -35,10 +35,11 @@ function run_tests()
 	HASH=`git log --oneline --no-abbrev | cut -d\  -f1 | head -1`
 	LOG_FILE=$local_branch-`date +%Y%m%d%H%M%S`-$HASH.csv
 	LOG_FILE=`echo $LOG_FILE | sed s@/@_@`
+	ERROR_LOG=$local_branch-`date +%Y%m%d%H%M%S`-$HASH-error.log
 	if ! test -f $LOG_FOLDER/*-$HASH.csv
 	then
 	# Run tests
-	    $SCRIPT_FOLDER/smews_test $SMEWS_FOLDER logfile=$LOG_FOLDER/$LOG_FILE
+	    $SCRIPT_FOLDER/smews_test $SMEWS_FOLDER errorlog=$LOG_FOLDER/$ERROR_LOG logfile=$LOG_FOLDER/$LOG_FILE
 	fi
     done
 }
