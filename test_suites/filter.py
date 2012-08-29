@@ -23,7 +23,7 @@ def validate_build(build_options):
 
     # icmpv6 NEEDS GPIP, if disabled, the build should not be performed
     if "icmpv6" in build_options["apps"]:
-        return not "general_purpose_ip_handler" in build_options["disable"]
+        return not "gpip" in build_options["disable"]
     return True
 
 
