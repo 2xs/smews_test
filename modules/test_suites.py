@@ -9,6 +9,8 @@ def get_list():
     global folder
     suites = system.get_subfolder_list(folder)
     suites.sort()
+    if "__pycache__" in suites:
+        suites.remove("__pycache__")
     return suites
 #####################################################    
 

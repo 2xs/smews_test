@@ -19,6 +19,7 @@ def execute(args):
         errorlog = open(logfile, "a+")
         devnull = open(os.devnull,"a+")
         errorlog.write("##################### Execution of {} ######################\n".format(args))
+        errorlog.flush()
     except IOError:
         errorlog = open(os.devnull, "a+")
     try:

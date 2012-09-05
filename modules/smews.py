@@ -48,7 +48,7 @@ def get_target_list():
 
 
 def get_disable_options():
-    return ['comet', 'post', 'timers', 'arguments', 'gpip']
+    return ['coroutines','comet', 'post', 'timers', 'arguments', 'gpip']
 #####################################################    
 
 def get_apps_folder():
