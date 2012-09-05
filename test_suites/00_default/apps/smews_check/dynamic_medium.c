@@ -34,35 +34,15 @@
 */
 /*
 <generator>
-        <handlers init="init_dynamic_medium" doGet="get_dynamic_medium"/>
+        <handlers doGet="get_dynamic_medium"/>
 	<properties persistence="volatile" />
 </generator>
  */
 
 #include "dynamic.h"
 
-static char array[ARRAY_SIZE];
-
-static char init_dynamic_medium(void)
-{
-    int i,j;
-    for (i = 0,j=32 ; i < ARRAY_SIZE ; ++i,++j)
-    {
-		if (j == 126)
-			j = 32;
-		switch (i % 80)
-		{
-			case 0: array[i] = '\r'; --j; break;
-			case 1: array[i] = '\n'; --j; break;
-			default: array[i] = j;
-		}
-    }
-    array[ARRAY_SIZE-1] = 0;
-    return 1;
-}
-
 static char get_dynamic_medium(struct args_t *args)
 {
-    out_str(array);
+    out_str(__array);
     return 1;
 }

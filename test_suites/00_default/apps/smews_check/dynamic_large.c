@@ -34,7 +34,7 @@
 */
 /*
 <generator>
-        <handlers init="init_dynamic_large" doGet="get_dynamic_large"/>
+        <handlers doGet="get_dynamic_large"/>
 	<properties persistence="volatile" />
 </generator>
  */
@@ -42,35 +42,11 @@
 
 #include "dynamic.h"
 
-
-static char array[ARRAY_SIZE];
-
-static char init_dynamic_large(void)
-{
-    int i,j;
-    for (i = 0,j=32 ; i < ARRAY_SIZE ; ++i,++j)
-    {
-		if (j == 126)
-			j = 32;
-		switch (i % 80)
-		{
-			case 0: array[i] = '\r'; --j; break;
-			case 1: array[i] = '\n'; --j; break;
-			default: array[i] = j;
-		}
-    }
-    array[ARRAY_SIZE-1] = 0;
-    return 1;
-}
-
 static char get_dynamic_large(struct args_t *args)
 {
-    uint32_t i = 0;
     uint16_t size = 100;
 
-    if (size == 0)
-	out_c('0');
-    while (i++ < size)
-	out_str(array);
+    while (--size)
+	out_str(__array);
     return 1;
 }

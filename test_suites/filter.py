@@ -1,3 +1,5 @@
+from modules import smews
+
 # Returns a list of targets that need icmpv6 if built with ipv6
 # For example, linux target does not need it as it uses a tun interface
 # so it can be tested locally without the need to answer neighbor solicitation
@@ -13,9 +15,20 @@ def discard_targets():
 def is_v6(ip):
     return ':' in ip
 
+def validate_funcard(build_options):
+    options = set(smews.get_disable_options())
+    disable = set(build_options["disable"].split(","))
+    intersect = options & disable
+    if len(intersect) == len(options):
+        print(intersect)
+    return len(intersect) == len(options)
+
 def validate_build(build_options):
     # This function check if the build corresponds to a valid configuration
     # that has to be tested
+
+    if build_options["target"] == "Funcard7":
+        return validate_funcard(build_options)
     
     # skeleton is not a real target
     if build_options["target"] in discard_targets():
