@@ -16,8 +16,8 @@ class ExecutionError(SystemError):
 def execute(args):
     global logfile
     try:
-        errorlog = open(logfile, "a+")
         devnull = open(os.devnull,"a+")
+        errorlog = open(logfile, "a+")
         errorlog.write("##################### Execution of {} ######################\n".format(args))
         errorlog.flush()
     except IOError:

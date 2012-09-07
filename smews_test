@@ -86,6 +86,7 @@ def ip_from_target(ip,target):
     return ip.format(available_targets.index(target)+10)
 
 def do_test_build(test_suite, build_options):
+    global build_only
     # Global filter (for all suites)
     if not test_suites.filter(".", build_options):
         return
@@ -95,7 +96,7 @@ def do_test_build(test_suite, build_options):
     # Build smews
     if test_build(test_suite, build_options):
         # Flash to device
-        if test_program(test_suite, build_options):
+        if not build_only and test_program(test_suite, build_options):
             # Run smews
             if test_run(test_suite, build_options):
                 # Executes tests
@@ -130,6 +131,7 @@ test_suites.folder = os.path.join(script_folder, "test_suites")
 targets_to_test = []
 test_suites_to_test = []
 disable = []
+build_only = False
 
 ips = ["ipv4", "ipv6"]
 errorfile = "error.log"
@@ -156,6 +158,11 @@ for arg in sys.argv[2:]:
         ips = iplist.split(",")
     if arg.startswith("errorlog="):
         k,e,errorfile = arg.partition("=")
+    if arg.startswith("build_only="):
+        k,e,build_only = arg.partition("=")
+
+
+build_only = build_only in ['yes', '1','true']
 
 system.create_logfile(os.path.join(script_folder, errorfile))
 
