@@ -34,54 +34,28 @@
 */
 /*
 <generator>
-        <handlers init="init_dynamic" doGet="get_dynamic"/>
+        <handlers doGet="get_dynamic"/>
 	<properties persistence="volatile" />
 	<args>
-                <arg name="size" type="uint16" />
-        </args>
+	        <arg name="size" type="uint16" />
+	</args>
 </generator>
  */
 
-#ifndef TEST_ARRAY_SIZE
-#ifdef DEV_MTU
-#define ARRAY_SIZE ((DEV_MTU-150) < 0 ? OUTPUT_BUFFER_SIZE : (DEV_MTU-150))
-#else
-#define ARRAY_SIZE OUTPUT_BUFFER_SIZE
-#endif
-#else
-#define ARRAY_SIZE TEST_ARRAY_SIZE
-#endif
 
-static char array[ARRAY_SIZE];
-
-static char init_dynamic(void)
-{
-    int i,j;
-    for (i = 0,j=32 ; i < ARRAY_SIZE ; ++i,++j)
-    {
-	if (j == 126)
-	    j = 32;
-	switch (i % 80)
-	{
-	    case 0: array[i] = '\r'; --j; break;
-	    case 1: array[i] = '\n'; --j; break;
-	    default: array[i] = j; break;
-	}
-    }
-    array[ARRAY_SIZE-1] = 0;
-    return 1;
-}
+#include "dynamic.h"
 
 static char get_dynamic(struct args_t *args)
 {
-    uint32_t i = 0;
     uint16_t size = args->size;
-    
+
     if (size == 0)
+    {
 	out_c('0');
-    
-    printf("Ouput of %d (%dx%d)bytes\r\n", size * (ARRAY_SIZE-1), size, ARRAY_SIZE-1);
-    while (i++ < size)
-	out_str(array);
+	return 1;
+    }
+
+    while (--size)
+	out_str(__array);
     return 1;
 }
