@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # $1: ip
 # $2: get url
 # $3: expected http code (200 if omitted)
