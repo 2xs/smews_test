@@ -46,9 +46,16 @@ def get_target_list():
     return system.get_subfolder_list(targets_folder)
 #####################################################    
 
-
+options = None
 def get_disable_options():
-    return ['coroutines','comet', 'post', 'timers', 'arguments', 'gpip']
+    global folder,options
+    if not options:
+        options = []
+        for line in open(os.path.join(folder, 'SConstruct')):
+            if "disabledHash" and "DISABLE" in line:
+                words = str.split(line, "'")
+                options.append(words[1])
+    return options
 #####################################################    
 
 def get_apps_folder():
