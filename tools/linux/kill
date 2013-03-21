@@ -2,8 +2,16 @@
 
 dir=`cd \`dirname $0\` && pwd`
 echo $dir >> /tmp/kill_log
+SUDO=sudo
+
+if [ `id -u` -eq 0 ]
+then
+	# Running as root
+	SUDO=""
+fi
+
 while $dir/is_alive
 do
-    sudo pkill smews.elf
+    $SUDO pkill smews.elf
 done
 ! $dir/is_alive

@@ -4,4 +4,10 @@ SMEWS_FOLDER=$1
 
 test -x $SMEWS_FOLDER/bin/linux/smews.elf || exit 1
 
-sudo -b $SMEWS_FOLDER/bin/linux/smews.elf
+if [ `id -u` -eq 0 ]
+then
+	# Executing as root
+	$SMEWS_FOLDER/bin/linux/smews.elf &
+else
+	sudo -b $SMEWS_FOLDER/bin/linux/smews.elf
+fi	
