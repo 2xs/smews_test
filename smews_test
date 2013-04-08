@@ -141,25 +141,29 @@ for arg in sys.argv[2:]:
     if arg.startswith("targets="):
         t, e, targets = arg.partition("=")
         targets_to_test = targets.split(",")
-    if arg.startswith("test_suites="):
+    elif arg.startswith("test_suites="):
         t, e, ts = arg.partition("=")
         test_suites_to_test = ts.split(",")
-    if arg.startswith("logfile="):
+    elif arg.startswith("logfile="):
         l, e, log = arg.partition("=")
         test.log_file = os.path.abspath(log)
-    if arg.startswith("tests="):
+    elif arg.startswith("tests="):
         t, e, tests = arg.partition("=")
         test_suites.only = tests.split(",")
-    if arg.startswith("disable="):
+    elif arg.startswith("disable="):
         t, e, dis = arg.partition("=")
         disable = dis.split(",")
-    if arg.startswith("ips="):
+    elif arg.startswith("ips="):
         t, e, iplist = arg.partition("=")
         ips = iplist.split(",")
-    if arg.startswith("errorlog="):
+    elif arg.startswith("errorlog="):
         k,e,errorfile = arg.partition("=")
-    if arg.startswith("build_only="):
+    elif arg.startswith("build_only="):
         k,e,build_only = arg.partition("=")
+    else:
+        sys.stderr.write("Bad option {0}\n".format(arg))
+        sys.exit(1)
+                    
 
 
 build_only = build_only in ['yes', '1','true']
