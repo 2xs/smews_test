@@ -43,6 +43,6 @@
 
 static char get_dynamic_medium(struct args_t *args)
 {
-    out_str(__array);
+    out_array();
     return 1;
 }

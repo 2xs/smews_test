@@ -47,6 +47,6 @@ static char get_dynamic_large(struct args_t *args)
     uint16_t size = 100;
 
     while (size--)
-	out_str(__array);
+	out_array();
     return 1;
 }
