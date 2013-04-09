@@ -55,7 +55,10 @@ static char get_dynamic(struct args_t *args)
 	return 1;
     }
 
-    while (--size)
-	out_str(__array);
+    while (size--)
+    {
+	out_array();
+	out_c('\n');
+    }
     return 1;
 }
