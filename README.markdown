@@ -58,17 +58,17 @@ is tested. You can tweak a test suite by following means:
    listing its name in an `useapps` file in the test suite folder. One application
    per line.
 
-3. A test suite can be designed *only* for given targets. To do so, list the targets
+3. A test suite may be designed *only* for given targets. To do so, list the targets
    in the `target` file, again one target per line.
 
-4. A test suite can be designed for all targets *except* some. To do so, list
+4. A test suite may be designed for all targets *except* some. To do so, list
    the targets to exclude in the `notarget` file, one target per line. Warning,
    this is combined with the previous file. Thus, if a target is listed in the
    `notarget` file, it will *not* be tested, even if it is present in the
    `target` file.
 
 5. By default, suites are tested for every possible combination of disable
-   options. You can force an option to be disable or to be activated using
+   options. You may force an option to be disabled or to be activated using
    `disable` and `nodisable` file. For example, if we suppose that the options
    that can be disabled in smews are `comet` and `post`, by default, the test
    suite will be run for each of the following build (the `disable=...` thing is
