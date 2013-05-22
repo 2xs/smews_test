@@ -42,7 +42,7 @@ def test_run(test_suite, build_options):
 def do_test(test_script, test_suite, build_options):
     test.begin(build_options["target"], what(os.path.basename(test_script), test_suite, build_options))
     try:
-        args = [test_script, build_options["ipaddr"]]
+        args = [test_script, build_options["ipaddr"], build_options["target"]]
         system.execute(args)
         test.success()
         return True
