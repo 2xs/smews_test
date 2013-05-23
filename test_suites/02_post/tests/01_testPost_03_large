@@ -1,0 +1,4 @@
+#!/bin/bash
+
+test_download.sh -p 'filename=@test_suites/02_post/tests/fakeFile5KB' $1 smews_post_test/post_single_file
+
