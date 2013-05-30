@@ -2,9 +2,8 @@
 
 SCRIPT_FOLDER=`cd \`dirname $0\` && pwd`
 LOG_FOLDER=$SCRIPT_FOLDER/logs
-SMEWS_FOLDER=$1
+SMEWS_FOLDER=`cd $1 && pwd`
 SMEWS_URL=${2-git://github.com/2xs/smews.git}
-
 
 function check_folders()
 {
@@ -19,7 +18,6 @@ function check_folders()
 function run_tests()
 {
     check_folders
-
     cd $SMEWS_FOLDER
     BRANCHES=`cd $SMEWS_FOLDER && git branch -a | grep origin | grep -v HEAD | sed 's/\*//g'`
     echo $BRANCHES
@@ -39,7 +37,7 @@ function run_tests()
 	if ! test -f $LOG_FOLDER/*-$HASH.csv
 	then
 	# Run tests
-	    $SCRIPT_FOLDER/smews_test $SMEWS_FOLDER errorlog=$LOG_FOLDER/$ERROR_LOG logfile=$LOG_FOLDER/$LOG_FILE
+	    cd $SCRIPT_FOLDER && ./smews_test $SMEWS_FOLDER errorlog=$LOG_FOLDER/$ERROR_LOG logfile=$LOG_FOLDER/$LOG_FILE
 	fi
     done
 }
